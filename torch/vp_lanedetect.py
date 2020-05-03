@@ -270,7 +270,7 @@ class VP4LaneDetection:
                 vp_pred = vp_pred.cpu().numpy()
                 rgb_img = rgb_img.cpu().numpy()
                 temp_dict = {'img':rgb_img, 'obj_mask_pred': obj_mask_pred, 'vp_pred':vp_pred}
-                scipy.io.savemat(str(batch_number) + "_pred", temp_dict)
+                scipy.io.savemat('test_pred/' + str(batch_number) + "_pred.mat", temp_dict)
 
         print("Done Testing!")
         
