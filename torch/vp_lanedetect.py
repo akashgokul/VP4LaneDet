@@ -262,7 +262,7 @@ class VP4LaneDetection:
         self.model.eval()
         with torch.no_grad():
             for batch_number, (img_name, rgb_img) in enumerate(dataloader):
-                img_name = img_name[0]
+                img_name = img_name[0][:-1]
                 rgb_img = rgb_img.to(device = self.device)
                 obj_mask_pred, vp_pred = self.model(rgb_img)
                 obj_mask_pred = (obj_mask_pred > 0.5)
@@ -271,7 +271,7 @@ class VP4LaneDetection:
                 vp_pred = vp_pred.cpu().numpy()
                 rgb_img = rgb_img.cpu().numpy()
                 temp_dict = {'img':rgb_img, 'obj_mask_pred': obj_mask_pred, 'vp_pred':vp_pred}
-                scipy.io.savemat(os.getcwd() + "/test_pred" + img_name + "_pred", temp_dict)
+                scipy.io.savemat(img_name + "_pred", temp_dict)
 
         print("Done Testing!")
         
