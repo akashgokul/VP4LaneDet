@@ -84,6 +84,7 @@ class VPGData(Dataset):
         else:
             img_name = self.test_img_names.iloc[idx][0]
         
+        print(img_name)
         #Read image
         img_path = self.rootdir + img_name
         #This creates a dictionary of mat file contents
