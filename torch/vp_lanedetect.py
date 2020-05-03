@@ -246,7 +246,7 @@ class VP4LaneDetection:
         vp_acc = vp_acc / num_batches
         obj_mask_acc = obj_mask_acc / num_batches
 
-        return obj_mask_loss, vp_loss , obj_mask_acc, vp_acc
+        return obj_mask_loss, vp_loss , 100 * obj_mask_acc, 100*vp_acc
 
 
     #TODO: Update test function to get test set predictions (Currently very naive)
