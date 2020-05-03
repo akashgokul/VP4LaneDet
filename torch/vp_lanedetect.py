@@ -119,7 +119,7 @@ class VP4LaneDetection:
 
             #Normalizing by number of batches
             train_loss = train_loss /  num_batches
-            train_vp_acc = train_vp_acc / num_batches
+            train_vp_acc = 100 * train_vp_acc / num_batches
 
             val_obj_mask_loss, validation_loss_vp, val_obj_mask_acc, validation_acc_vp = self.eval(validation_dataloader)
             elapsed = time.time() - start_time
@@ -179,8 +179,8 @@ class VP4LaneDetection:
 
             #Normalizing by number of batches
             train_loss = train_loss /  num_batches
-            train_acc_vp_p2 = train_acc_vp_p2 / num_batches
-            train_acc_obj = train_acc_obj / num_batches
+            train_acc_vp_p2 = 100 * train_acc_vp_p2 / num_batches
+            train_acc_obj = 100 * train_acc_obj / num_batches
 
             val_obj_mask_loss, validation_loss_vp, val_obj_mask_acc, validation_acc_vp = self.eval(validation_dataloader)
             elapsed = time.time() - start_time
