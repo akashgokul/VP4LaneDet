@@ -32,9 +32,9 @@ class VPGData(Dataset):
         self.df_from_csv = pd.read_csv(csv_path)
         self.num_imgs = len(self.df_from_csv.index)
 
-        #Shuffles rows
-        np.random.seed(0)
-        self.df_from_csv = self.df_from_csv.iloc[np.random.permutation(self.num_imgs)]
+        # #Shuffles rows
+        # np.random.seed(0)
+        # self.df_from_csv = self.df_from_csv.iloc[np.random.permutation(self.num_imgs)]
         
         #On Savio some data missing, so using this
         row2delete = []
@@ -97,7 +97,6 @@ class VPGData(Dataset):
         rgb_img = rgb_img.astype(np.float32)
 
         if(self.split == 'test'):
-            print("HERE")
             return rgb_img
 
         #Slices only the 4th channel (0-indexed) for the obj mask
