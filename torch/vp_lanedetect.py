@@ -84,9 +84,9 @@ class VP4LaneDetection:
             print("VP Training Phase")
             print("-----"*10)
             num_batches = len(train_dataloader)
-            for batch_number, (rgb_img, obj_mask ,vp) in enumerate(train_dataloader):
-                print("Training Batch: " + str(batch_number) + " / " + str(num_batches))
+            for batch_number, (rgb_img, obj_mask ,vp) in tqdm(enumerate(train_dataloader)):
                 rgb_img = rgb_img.type(torch.FloatTensor)
+                rgb_img = rgb_img.to(device=self.device)
 
                 #Need for loss comp.
                 obj_mask = obj_mask.type(torch.FloatTensor)
@@ -140,8 +140,7 @@ class VP4LaneDetection:
             print("----"*10)
             print("Complete Net Training Phase (Phase II)")
             print("----"*10)
-            for batch_number, (rgb_img, obj_mask, vp) in enumerate(train_dataloader):
-                print("Training Batch: " + str(batch_number) + " / " + str(num_batches))
+            for batch_number, (rgb_img, obj_mask, vp) in tqdm(enumerate(train_dataloader)):
                 rgb_img = rgb_img.type(torch.FloatTensor)
                 rgb_img = rgb_img.to(device=self.device)
 
