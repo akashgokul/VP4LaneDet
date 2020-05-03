@@ -266,7 +266,7 @@ class VP4LaneDetection:
                 obj_mask_pred = obj_mask_pred.numpy()
                 vp_pred = vp_pred.numpy()
                 temp_dict = {'obj_mask_pred': obj_mask_pred, 'vp_pred':vp_pred}
-                scipy.io.savemat(os.getcwd() + "/test_pre/" + img_name + "_pred", temp_dict)
+                scipy.io.savemat(os.getcwd() + "/test_pred/" + img_name + "_pred", temp_dict)
 
         print("Done Testing!")
         
