@@ -84,7 +84,8 @@ class VP4LaneDetection:
             print("VP Training Phase")
             print("-----"*10)
             num_batches = len(train_dataloader)
-            for batch_number, (rgb_img, obj_mask ,vp) in enumerate(tqdm(train_dataloader)):
+            for batch_number, (rgb_img, obj_mask ,vp) in enumerate(train_dataloader):
+                print("Training Batch: " + str(batch_number) + " / " + str(num_batches))
                 rgb_img = rgb_img.type(torch.FloatTensor)
                 rgb_img = rgb_img.to(device=self.device)
 
@@ -140,7 +141,8 @@ class VP4LaneDetection:
             print("----"*10)
             print("Complete Net Training Phase (Phase II)")
             print("----"*10)
-            for batch_number, (rgb_img, obj_mask, vp) in enumerate(tqdm(train_dataloader)):
+            for batch_number, (rgb_img, obj_mask, vp) in enumerate(train_dataloader):
+                print("Training Batch: " + str(batch_number) + " / " + str(num_batches))
                 rgb_img = rgb_img.type(torch.FloatTensor)
                 rgb_img = rgb_img.to(device=self.device)
 
@@ -206,7 +208,7 @@ class VP4LaneDetection:
             obj_mask_acc = 0.0
 
             num_batches = len(dataloader)
-            for batch_number, (rgb_img,obj_mask, vp) in enumerate(tqdm(dataloader)):
+            for batch_number, (rgb_img,obj_mask, vp) in enumerate(dataloader):
                 print("Eval Batch: " + str(batch_number) + " / " + str(num_batches))
                 rgb_img = rgb_img.type(torch.FloatTensor)
                 rgb_img = rgb_img.to(device=self.device)
@@ -259,7 +261,7 @@ class VP4LaneDetection:
 
         self.model.eval()
         with torch.no_grad():
-            for batch_number, (rgb_img, img_name) in enumerate(tqdm(dataloader)):
+            for batch_number, (rgb_img, img_name) in tqdm(enumerate(dataloader)):
                 rgb_img = rgb_img.to(device = self.device)
                 obj_mask_pred, vp_pred = torch.round(self.model(rgb_img))
                 obj_mask_pred = obj_mask_pred.numpy()
