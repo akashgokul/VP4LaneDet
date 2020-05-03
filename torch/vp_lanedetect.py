@@ -121,11 +121,11 @@ class VP4LaneDetection:
             train_loss = train_loss /  num_batches
             train_vp_acc = train_vp_acc / num_batches
 
-            validation_loss, validation_acc = self.eval(validation_dataloader)
+            val_obj_mask_loss, validation_loss_vp, val_obj_mask_acc, validation_acc_vp = self.eval(validation_dataloader)
             elapsed = time.time() - start_time
             print(
-                "Validation Training: Epoch {:d} Train loss: {:.2f}. Train Accuracy: {:.2f}. Validation loss: {:.2f}. Validation Accuracy: {:.2f}. Elapsed time: {:.2f}ms. \n".format(
-                e + 1, train_loss, train_vp_acc, validation_loss, validation_acc, elapsed)
+                "General Training: Epoch {:d} Train loss: {:.2f}. Train Accuracy Obj Mask: {:.2f}. Train Accuracy VP: {:.2f}. Validation loss OBJ: {:.2f}. Validation Accuracy OBJ: {:.2f}. Validation Loss VP: {:.2f}. Validation Accuracy VP: {:.2f}. Elapsed time: {:.2f}ms. \n".format(
+                e + 1, train_loss, train_acc_obj, train_acc_vp_p2, val_obj_mask_loss, val_obj_mask_acc, validation_loss_vp, validation_acc_vp, elapsed)
                 )
 
         
