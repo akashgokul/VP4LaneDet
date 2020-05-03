@@ -261,7 +261,7 @@ class VP4LaneDetection:
 
         self.model.eval()
         with torch.no_grad():
-            for batch_number, (rgb_img, img_name) in enumerate(dataloader):
+            for batch_number, rgb_img in enumerate(dataloader):
                 rgb_img = rgb_img.to(device = self.device)
                 obj_mask_pred, vp_pred = torch.round(self.model(rgb_img))
                 obj_mask_pred = obj_mask_pred.numpy()
