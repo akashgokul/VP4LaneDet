@@ -1,0 +1,164 @@
+#Torch dataset to perform pre-processing of VPGNet data
+import os
+import torch
+from torch.utils.data import Dataset, DataLoader
+from torchvision import transforms, utils
+
+import math
+import numpy as np 
+import pandas as pd
+from scipy import misc, io
+
+class VPGData(Dataset):
+    def __init__(self, rootdir: str, csv_path: str, transform=None, split = 'train'):
+        """
+        Args: 
+            Rootdir: String of rootdir to the  (Assumes DOES NOT end with '/')
+            Csv_path: String of directory of csv file containing paths of all images
+                - This CSV file should contain the RELATIVE PATH of the imgs (don't worry about root)
+
+            Tranform: Torch.transform to be performed on data 
+
+            Split: String denoting the type of dataset (train, validation , test). Currently 80-20 split
+        """
+        
+        assert rootdir[-1] != '/'
+        split = split.lower()
+        assert split in ['train', 'validation', 'test']
+
+        self.rootdir = rootdir
+
+        #Reads csv
+        self.df_from_csv = pd.read_csv(csv_path)
+        self.num_imgs = len(self.df_from_csv.index)
+
+        #Shuffles rows
+        np.random.seed(0)
+        self.df_from_csv = self.df_from_csv.iloc[np.random.permutation(self.num_imgs)]
+
+        #setting split
+        self.split = split
+
+        #Assigning test set
+        self.num_test_samples = math.floor(0.2 * self.num_imgs)
+        self.test_img_names = self.df_from_csv.iloc[self.num_test_samples:]
+
+        train_and_valid_img_names = self.df_from_csv.iloc[:self.num_test_samples]
+
+        #Assigning train set
+        self.num_train_samples = math.floor(0.6 * len(train_and_valid_img_names.index))
+        self.train_img_names = train_and_valid_img_names.iloc[0 : self.num_train_samples]
+
+        #Assigning validation set
+        self.validation_img_names = train_and_valid_img_names.iloc[self.num_train_samples:]
+        self.num_validation_samples = len(self.validation_img_names.index)
+
+        #This is just the normal torch transform (e.g. Normalizing image, etc. )
+        #NOT the data preprocessing (e.g. shift lane labels) we need to do!
+        self.transform = transform
+    
+    def __len__(self):
+        if(self.split == 'train'):
+            return self.num_train_samples
+        elif(self.split == 'validation'):
+            return self.num_validation_samples
+        else:
+            return self.num_test_samples
+    
+    def __getitem__(self,idx):
+
+        #Gets the img corresponding to idx and split
+        if(self.split == 'train'):
+            img_name = self.train_img_names.iloc[idx][0]
+        elif(self.split == 'validation'):
+            img_name = self.validation_img_names.iloc[idx][0]
+        else:
+            img_name = self.test_img_names.iloc[idx][0]
+        
+        #Read image
+        img_path = self.rootdir + img_name
+        #This creates a dictionary of mat file contents
+        mat_dict = io.loadmat(img_path)
+        
+        #Get 5 channel img
+        img = mat_dict['rgb_seg_vp']
+
+        #Slices first 3 channels for the rgb portion of img
+        rgb_img = img[:,:,:3]
+        rgb_img = np.resize(rgb_img,(3,480,640))
+
+        #Slices only the 4th channel (0-indexed) for the obj mask
+        obj_mask = img[:, :, 3]
+        
+        #Creates binary mask mapping {0,7} -> {0,1}
+        f = lambda x: 1 if (x >= 1 and x <=7) else 0
+        f_func = np.vectorize(f)
+        obj_mask = f_func(obj_mask)
+
+        #Resize into 60x80 the size of output
+        obj_mask = np.resize(obj_mask, (1,120,160))
+
+        #Repeating for the second channel which inverts all values in first channel computed above ^
+        g = lambda x: 1 if (x == 0) else 0
+        g_func = np.vectorize(g)
+        obj_channel_2 = np.copy(obj_mask)
+        obj_mask_channel_2 = g_func(obj_channel_2)
+        obj_mask_channel_2 = np.resize(obj_mask_channel_2, (1,120,160))
+
+        #Stacks the channels together to create (120,60,2)
+        obj_mask = np.dstack((obj_mask, obj_mask_channel_2))
+
+
+        #Extracts 5th dimension to get vpp
+        vp  = img[:,:,4]
+
+        #Maps VP to only count easy (Map is {0,2} -> {0,1})
+        h = lambda x: 1 if (x == 1) else 0
+        h_func = np.vectorize(h)
+        vp = h_func(vp)
+        zero_vp = np.zeros_like(vp)
+
+        #If no vp exists case:
+        #Creates 4 channels of zero and final channel of all 1
+        if(np.array_equal(vp, zero_vp)):
+            vp = np.dstack((vp, vp, vp, vp, np.ones_like(zero_vp)))
+
+        #Case where VP exists
+        else:
+            #Fifth channel is all zero b/c if VP exists => absence channel = 0
+            fifth_channel = zero_vp
+
+            #Finds pixel coordinates of vp
+            row_vp, col_vp = np.nonzero(vp)
+            row_vp = row_vp[0]
+            col_vp = col_vp [0]
+
+            #Creates first channel corresp to upper left corner relative to VP
+            first_channel_upperL_corner = np.ones((row_vp, col_vp, 1))
+            first_channel_upperL_corner.resize(vp.shape)
+
+            #Creates second channel corresp to upper right corner relative to VP
+            second_channel_upperR_corner = np.ones((row_vp,vp.shape[1]-col_vp, 1))
+            second_channel_upperR_corner.resize(vp.shape)
+
+            #Creates third channel corresp to lower left corner relative to VP
+            third_channel_lowerL_corner = np.ones((vp.shape[0] - row_vp, col_vp, 1))
+            third_channel_lowerL_corner.resize(vp.shape)
+
+            #Creates fourth channel corresp to lower right corner relative to VP
+            forth_channel_lowerR_corner = np.ones((vp.shape[0] - row_vp, vp.shape[1]-col_vp, 1))
+            forth_channel_lowerR_corner.resize(vp.shape)
+
+            #Stacks all the channels above
+            vp = np.dstack((first_channel_upperL_corner, second_channel_upperR_corner, third_channel_lowerL_corner, forth_channel_lowerR_corner, fifth_channel))
+
+        vp = np.resize(vp, (5,120,160))
+
+        rgb_img = rgb_img.astype(np.float32)
+        obj_mask = obj_mask.astype(np.float32)
+        vp = vp.astype(np.float32)
+
+        return rgb_img, obj_mask, vp
+
+
+
