@@ -167,7 +167,7 @@ class VPGData(Dataset):
         vp = vp.astype(np.float32)
 
         if(self.split == 'test'):
-            return rgb_img, img_name
+            return rgb_img
 
         return rgb_img, obj_mask, vp
 
