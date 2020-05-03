@@ -234,8 +234,8 @@ class VP4LaneDetection:
                 obj_mask_pred = obj_mask_pred.view(obj_mask.shape)
                 vp_pred = vp_pred.view(vp.shape)
 
-                vp_acc += ((vp_pred == vp).sum().item() )  / (vp.size(0) * vp.size(1) * vp.size(2))
-                obj_mask_acc += ((obj_mask_pred == obj_mask).sum().item() )  / (obj_mask.size(0) * obj_mask.size(1) * obj_mask.size(2))
+                vp_acc += ((vp_pred == vp).sum().item() )  / (vp.size(0) * vp.size(1) * vp.size(2) * vp.size(3))
+                obj_mask_acc += ((obj_mask_pred == obj_mask).sum().item() )  / (obj_mask.size(0) * obj_mask.size(1) * obj_mask.size(2)*obj_mask.size(3))
 
                 obj_mask_loss += loss_obj_mask
                 vp_loss += loss_vp
