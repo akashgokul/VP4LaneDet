@@ -16,7 +16,7 @@ def main(args):
 
     train_dataloader = DataLoader(train_dataset, batch_size = args.batch_size, shuffle = True, num_workers = 1)
     valid_dataloader = DataLoader(valid_dataset, batch_size = 1, shuffle = True, num_workers = 1)
-    test_dataloader = DataLoader(test_dataset, batch_size = 1, shuffle = True, num_workers = 1)
+    test_dataloader = DataLoader(test_dataset, batch_size = 1, shuffle = True, num_workers = 0)
 
     model = VPGNet()
     helper = VP4LaneDetection(model = model, learning_rate = args.learning_rate)
