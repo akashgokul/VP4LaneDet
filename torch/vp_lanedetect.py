@@ -113,7 +113,7 @@ class VP4LaneDetection:
                 train_loss += loss_vp.item()
                 #Using PIXEL-Wise Accuracy!
                 vp_pred = vp_pred.view(vp.shape)
-                train_vp_acc += ((vp_pred == vp).sum().item() )  / (vp.size(0) * vp.size(1) * vp.size(2))
+                train_vp_acc += ((vp_pred == vp).sum().item() )  / (vp.size(0) * vp.size(1) * vp.size(2) * vp.size(3))
 
                 self.optimizer.zero_grad()
 
@@ -173,8 +173,8 @@ class VP4LaneDetection:
                 obj_mask_pred = obj_mask_pred.view(obj_mask.shape)
 
 
-                train_acc_vp_p2 += ((vp_pred == vp).sum().item() )  / (vp.size(0) * vp.size(1) * vp.size(2))
-                train_acc_obj += ((obj_mask_pred == obj_mask).sum().item() )  / (obj_mask.size(0) * obj_mask.size(1) * obj_mask.size(2))
+                train_acc_vp_p2 += ((vp_pred == vp).sum().item() )  / (vp.size(0) * vp.size(1) * vp.size(2) * vp.size(3))
+                train_acc_obj += ((obj_mask_pred == obj_mask).sum().item() )  / (obj_mask.size(0) * obj_mask.size(1) * obj_mask.size(2)*vp.size(3))
                 self.optimizer.zero_grad()
 
             #Normalizing by number of batches
