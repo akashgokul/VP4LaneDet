@@ -106,7 +106,7 @@ class VP4LaneDetection:
 
 
                 #CHECK THIS BELOW!!!!
-                loss_vp.backward()
+                loss_vp.backward(retain_graph = True)
                 self.optimizer.step()
 
                 #Updating training accuracy and training loss
@@ -165,7 +165,7 @@ class VP4LaneDetection:
                     w4 = 1 / loss_vp
 
                 loss = w1*loss_obj_mask + w4*loss_vp
-                loss.backward()
+                loss.backward(retain_graph = True)
                 self.optimizer.step()
                 train_loss+= loss.item()
 
@@ -266,7 +266,8 @@ class VP4LaneDetection:
                 obj_mask_pred, vp_pred = torch.round(self.model(rgb_img))
                 obj_mask_pred = obj_mask_pred.numpy()
                 vp_pred = vp_pred.numpy()
-                temp_dict = {'obj_mask_pred': obj_mask_pred, 'vp_pred':vp_pred}
+                rgb_img = rgb_img.numpy()
+                temp_dict = {'img':rgb_img, 'obj_mask_pred': obj_mask_pred, 'vp_pred':vp_pred}
                 scipy.io.savemat(os.getcwd() + "/test_pred/" + img_name + "_pred", temp_dict)
 
         print("Done Testing!")
