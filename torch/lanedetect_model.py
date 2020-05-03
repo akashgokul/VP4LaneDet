@@ -1,12 +1,12 @@
 import torch
 import torch.nn as nn
 
-#Recreating VPGNet Architecture in Torch, to make it easier to run
+#Testing VPGNet Arch without VP (for comparision purposes)
 
-class VPGNet(nn.Module):
+class LaneDetect(nn.Module):
 
     def __init__(self):
-        super(VPGNet, self).__init__()
+        super(LaneDetect, self).__init__()
         #Followed Figure 3 pg.5 of VPGNet paper
         self.shared = nn.Sequential(
             #Conv1
@@ -46,15 +46,15 @@ class VPGNet(nn.Module):
             #Tiling
             #nn.ConvTranspose2d(128, 2, kernel_size = 8)
         )
-        self.vp = nn.Sequential(
-            #Conv 7
-            nn.Conv2d(4096, 4096, kernel_size=1, stride=1, padding=0), 
-            nn.Dropout(),
-            #Conv 8
-            nn.Conv2d(4096, 320, kernel_size=1, stride=1, padding=0), 
-            #Tiling
-            #nn.ConvTranspose2d(320, 5, kernel_size = 8),
-        )
+        # self.vp = nn.Sequential(
+        #     #Conv 7
+        #     nn.Conv2d(4096, 4096, kernel_size=1, stride=1, padding=0), 
+        #     nn.Dropout(),
+        #     #Conv 8
+        #     nn.Conv2d(4096, 320, kernel_size=1, stride=1, padding=0), 
+        #     #Tiling
+        #     #nn.ConvTranspose2d(320, 5, kernel_size = 8),
+        # )
         
         
     def forward(self, x):
@@ -69,9 +69,9 @@ class VPGNet(nn.Module):
         # obj_mask = obj_mask.view(120,160,2)
 
         #Pass through the vp branch 
-        vp = torch.sigmoid(self.vp(x))
+        # vp = torch.sigmoid(self.vp(x))
         # #Reshape into (120,160,5)
         # vp = vp.view(120,160,5)
 
-        return obj_mask, vp
+        return obj_mask      #, vp
         

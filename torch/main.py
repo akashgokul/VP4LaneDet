@@ -6,6 +6,9 @@ from vp_lanedetect import VP4LaneDetection
 from vpgnet_torch import VPGNet
 from dataset import VPGData
 
+from lanedetect_model import LaneDetect
+from lanedetect import LaneDetectionHelper
+
 
 def main(args):
 
@@ -18,8 +21,13 @@ def main(args):
     valid_dataloader = DataLoader(valid_dataset, batch_size = 1, shuffle = True, num_workers = 1)
     test_dataloader = DataLoader(test_dataset, batch_size = 1, shuffle = True, num_workers = 1)
 
-    model = VPGNet()
-    helper = VP4LaneDetection(model = model, learning_rate = args.learning_rate)
+    if(args.model == 'naive'):
+        model = LaneDetect()
+        helper = LaneDetectionHelper(model = model, learning_rate = args.learning_rate)
+    
+    else:
+        model = VPGNet()
+        helper = VP4LaneDetection(model = model, learning_rate = args.learning_rate)
 
     helper.train(train_dataloader, valid_dataloader, args.num_epochs_vp, args.num_epochs_general)
     # obj_mask_loss, vp_loss , obj_mask_acc, vp_acc = helper.eval(test_dataloader)
@@ -31,7 +39,9 @@ def main(args):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser('VPGNet Training')
+    parser = argparse.ArgumentParser('Vanishing Point for Lane Detection')
+
+    parser.add_argument("--model", type=str, choices = ['naive','VPGNet'], help = 'Type of Model (naive = no vp, VPGNet = w/ VP)')
 
     #Data
     parser.add_argument('--root_dir', type=str,
