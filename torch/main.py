@@ -15,14 +15,15 @@ def main(args):
     test_dataset = VPGData(args.root_dir, args.csv_path, transform = None, split = 'test')
 
     train_dataloader = DataLoader(train_dataset, batch_size = args.batch_size, shuffle = True, num_workers = 1)
-    valid_dataloader = DataLoader(valid_dataset, batch_size = args.batch_size, shuffle = True, num_workers = 1)
-    test_dataloader = DataLoader(test_dataset, batch_size = args.batch_size, shuffle = True, num_workers = 1)
+    valid_dataloader = DataLoader(valid_dataset, batch_size = 1, shuffle = True, num_workers = 1)
+    test_dataloader = DataLoader(test_dataset, batch_size = 1, shuffle = True, num_workers = 1)
 
     model = VPGNet()
     helper = VP4LaneDetection(model = model, learning_rate = args.learning_rate)
 
     helper.train(train_dataloader, valid_dataloader, args.num_epochs_vp, args.num_epochs_general)
     helper.eval(test_dataloader)
+    helper.test(test_dataloader)
 
 
 

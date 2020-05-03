@@ -158,6 +158,9 @@ class VPGData(Dataset):
         obj_mask = obj_mask.astype(np.float32)
         vp = vp.astype(np.float32)
 
+        if(self.split == 'test'):
+            return rgb_img, img_name
+            
         return rgb_img, obj_mask, vp
 
 

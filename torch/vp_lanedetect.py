@@ -1,7 +1,9 @@
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
-
+import os
+import numpy as np
+import scipy.io
 import tqdm
 import time
 from vpgnet_torch import VPGNet
@@ -256,15 +258,18 @@ class VP4LaneDetection:
 
         """
 
-        #TODO: Fix obj_mask-mask/vp
-        predictions = []
         self.model.eval()
         with torch.no_grad():
-            for batch_number, rgb_img in tqdm(enumerate(dataloader)):
+            for batch_number, (rgb_img, img_name) in tqdm(enumerate(dataloader)):
                 rgb_img = rgb_img.to(device = self.device)
-                obj_mask, vp = torch.round(self.model(rgb_img))
-                predictions.append(obj_mask)
+                obj_mask_pred, vp_pred = torch.round(self.model(rgb_img))
+                obj_mask_pred = obj_mask_pred.numpy()
+                vp_pred = vp_pred.numpy()
+                temp_dict = {'obj_mask_pred': obj_mask_pred, 'vp_pred':vp_pred}
+                scipy.io.savemat(os.getcwd() + "/test_pre/" + img_name + "_pred", temp_dict)
+
+        print("Done Testing!")
         
-        return predictions
+        return
 
 
