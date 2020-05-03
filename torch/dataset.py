@@ -98,7 +98,7 @@ class VPGData(Dataset):
         rgb_img = rgb_img.astype(np.float32)
 
         if(self.split == 'test'):
-            return rgb_img
+            return img_name, rgb_img
 
         #Slices only the 4th channel (0-indexed) for the obj mask
         obj_mask = img[:, :, 3]
