@@ -22,7 +22,7 @@ def main(args):
     helper = VP4LaneDetection(model = model, learning_rate = args.learning_rate)
 
     helper.train(train_dataloader, valid_dataloader, args.num_epochs_vp, args.num_epochs_general)
-    helper.eval(test_dataloader)
+    # obj_mask_loss, vp_loss , obj_mask_acc, vp_acc = helper.eval(test_dataloader)
     helper.test(test_dataloader)
 
 
