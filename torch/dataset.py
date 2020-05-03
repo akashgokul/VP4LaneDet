@@ -35,6 +35,14 @@ class VPGData(Dataset):
         #Shuffles rows
         np.random.seed(0)
         self.df_from_csv = self.df_from_csv.iloc[np.random.permutation(self.num_imgs)]
+        
+        #On Savio some data missing, so using this
+        row2delete = []
+        for index, row in self.df_from_csv.iterrows():
+            img_name = row[0]
+            if(not os.path.exists(self.rootdir + img_name)):
+                row2delete.append(index)
+        self.df_from_csv = self.df_from_csv.drop(index=row2delete)
 
         #setting split
         self.split = split
@@ -160,7 +168,7 @@ class VPGData(Dataset):
 
         if(self.split == 'test'):
             return rgb_img, img_name
-            
+
         return rgb_img, obj_mask, vp
 
 
