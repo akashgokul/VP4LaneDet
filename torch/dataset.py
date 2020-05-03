@@ -30,11 +30,7 @@ class VPGData(Dataset):
 
         #Reads csv
         self.df_from_csv = pd.read_csv(csv_path)
-        self.num_imgs = len(self.df_from_csv.index)
 
-        # #Shuffles rows
-        # np.random.seed(0)
-        # self.df_from_csv = self.df_from_csv.iloc[np.random.permutation(self.num_imgs)]
         
         #On Savio some data missing, so using this
         row2delete = []
@@ -43,6 +39,11 @@ class VPGData(Dataset):
             if(not os.path.exists(self.rootdir + img_name)):
                 row2delete.append(index)
         self.df_from_csv = self.df_from_csv.drop(index=row2delete)
+        self.num_imgs = len(self.df_from_csv.index)
+
+        #Shuffles rows
+        np.random.seed(0)
+        self.df_from_csv = self.df_from_csv.iloc[np.random.permutation(self.num_imgs)]
 
         #setting split
         self.split = split
