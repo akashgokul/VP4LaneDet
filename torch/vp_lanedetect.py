@@ -32,7 +32,7 @@ class VP4LaneDetection:
         if torch.cuda.device_count() > 1:
             model = nn.DataParallel(model)
 
-        model.to(device=self.device)   
+        model.to(device=self.device)
 
         self.loss_vp = loss_vp
         self.loss_obj_mask = loss_obj_mask
@@ -117,7 +117,7 @@ class VP4LaneDetection:
 
                 #Updating training accuracy and training loss
                 train_loss += loss_vp.item()
-                train_vp_acc += ((vp_pred == vp).sum().item() )  / (vp.shape[0] * vp.shape[1] * vp.shape[2] * vp.shape[3])
+                train_vp_acc += ((vp_pred == vp).sum().item() )  / (vp_pred.shape[0] * vp_pred.shape[1] * vp_pred.shape[2] * vp_pred.shape[3])
 
                 self.optimizer.zero_grad()
 
@@ -187,8 +187,8 @@ class VP4LaneDetection:
                 train_loss+= loss.item()
 
 
-                train_acc_vp_p2 += ((vp_pred == vp).sum().item() )  / (vp.shape[0] * vp.shape[1] * vp.shape[2] * vp.shape[3])
-                train_acc_obj += ((obj_mask_pred == obj_mask).sum().item() )  / (obj_mask.shape[0] * obj_mask.shape[1] * obj_mask.shape[2]*vp.shape[3])
+                train_acc_vp_p2 += ((vp_pred == vp).sum().item() )  / (vp_pred.shape[0] * vp_pred.shape[1] * vp_pred.shape[2] * vp_pred.shape[3])
+                train_acc_obj += ((obj_mask_pred == obj_mask).sum().item() )  / (obj_mask_pred.shape[0] * obj_mask_pred.shape[1] * obj_mask_pred.shape[2]*vp_pred.shape[3])
                 self.optimizer.zero_grad()
 
             #Normalizing by number of batches
@@ -268,8 +268,8 @@ class VP4LaneDetection:
                 obj_mask_loss += loss_obj_mask.item()
 
 
-                vp_acc += ((vp_pred == vp).sum().item() )  / (vp.shape[0] * vp.shape[1] * vp.shape[2] * vp.shape[3])
-                obj_mask_acc += ((obj_mask_pred == obj_mask).sum().item() )  / (obj_mask.shape[0] * obj_mask.shape[1] * obj_mask.shape[2]*obj_mask.shape[3])
+                vp_acc += ((vp_pred == vp).sum().item() )  / (vp_pred.shape[0] * vp_pred.shape[1] * vp_pred.shape[2] * vp_pred.shape[3])
+                obj_mask_acc += ((obj_mask_pred == obj_mask).sum().item() )  / (obj_mask_pred.shape[0] * obj_mask_pred.shape[1] * obj_mask_pred.shape[2]*obj_mask_pred.shape[3])
 
                 obj_mask_loss += loss_obj_mask
                 vp_loss += loss_vp
