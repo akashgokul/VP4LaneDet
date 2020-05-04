@@ -264,7 +264,7 @@ class VP4LaneDetection:
 
                 obj_mask_pred = outputs[0]
                 obj_mask_pred = obj_mask_pred.to(device=self.device)
-                
+
                 vp_pred = outputs[1]
                 vp_pred = vp_pred.to(device=self.device)
 
@@ -310,6 +310,7 @@ class VP4LaneDetection:
                 vp_pred = (vp_pred > 0.5)
                 vp_pred = vp_pred.cpu().numpy()
                 rgb_img = rgb_img.cpu().numpy()
+                rgb_img = np.rollaxis(rgb_img, 0, 2) 
                 temp_dict = {'img':rgb_img, 'obj_mask_pred': obj_mask_pred, 'vp_pred':vp_pred}
                 scipy.io.savemat('test_pred/' + str(batch_number) + "_pred.mat", temp_dict)
 
