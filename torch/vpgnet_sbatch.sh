@@ -12,7 +12,7 @@
 #SBATCH --nodes=1
 #
 # Request cores (24, for example)
-#SBATCH --ntasks-per-node=2
+#SBATCH --ntasks-per-node=1
 #
 #Request GPUs
 #SBATCH --gres=gpu:2
