@@ -94,7 +94,7 @@ class VPGData(Dataset):
 
         #Slices first 3 channels for the rgb portion of img
         rgb_img = img[:,:,:3]
-        rgb_img = np.resize(rgb_img,(3,480,640))
+        rgb_img = np.rollaxis(rgb_img, 2, 0) 
         rgb_img = rgb_img.astype(np.float32)
 
         if(self.split == 'test'):
@@ -107,19 +107,19 @@ class VPGData(Dataset):
         f = lambda x: 1 if (x >= 1 and x <=7) else 0
         f_func = np.vectorize(f)
         obj_mask = f_func(obj_mask)
-
         #Resize into 60x80 the size of output
-        obj_mask = np.resize(obj_mask, (1,120,160))
+        obj_mask = np.resize(obj_mask, (120,160))
 
         #Repeating for the second channel which inverts all values in first channel computed above ^
         g = lambda x: 1 if (x == 0) else 0
         g_func = np.vectorize(g)
         obj_channel_2 = np.copy(obj_mask)
         obj_mask_channel_2 = g_func(obj_channel_2)
-        obj_mask_channel_2 = np.resize(obj_mask_channel_2, (1,120,160))
+        obj_mask_channel_2 = np.resize(obj_mask_channel_2, (120,160))
 
         #Stacks the channels together to create (120,60,2)
         obj_mask = np.dstack((obj_mask, obj_mask_channel_2))
+        obj_mask = np.rollaxis(obj_mask, 2, 0) 
 
 
         #Extracts 5th dimension to get vpp
@@ -165,7 +165,7 @@ class VPGData(Dataset):
             #Stacks all the channels above
             vp = np.dstack((first_channel_upperL_corner, second_channel_upperR_corner, third_channel_lowerL_corner, forth_channel_lowerR_corner, fifth_channel))
 
-        vp = np.resize(vp, (5,120,160))
+        vp = np.rollaxis(vp, 2, 0) 
 
         obj_mask = obj_mask.astype(np.float32)
         vp = vp.astype(np.float32)

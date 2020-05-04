@@ -4,13 +4,12 @@ from torch.utils.data import DataLoader
 import os
 import numpy as np
 import scipy.io
-import tqdm
 import time
 from lanedetect_model import LaneDetect
 
 class LaneDetectionHelper:
     def __init__(self,
-                model: VPGNet,
+                model: LaneDetect,
                 loss = nn.BCELoss(),
                 optimizer = None ,
                 learning_rate = 1e-3):

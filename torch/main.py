@@ -41,7 +41,9 @@ def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser('Vanishing Point for Lane Detection')
 
-    parser.add_argument("--model", type=str, choices = ['naive','VPGNet'], help = 'Type of Model (naive = no vp, VPGNet = w/ VP)')
+    parser.add_argument("--model", type=str, 
+                        choices = ['naive','VPGNet'],default = 'VPGNet', 
+                        help = 'Type of Model (naive = no vp, VPGNet = w/ VP)')
 
     #Data
     parser.add_argument('--root_dir', type=str,

@@ -73,6 +73,11 @@ class VP4LaneDetection:
         assert num_epochs_vp > 0
         assert num_epochs_general > 0
 
+        vp_phase_train_loss = []
+        vp_phase_train_acc = []
+        vp_phase_val_loss = []
+        vp_phase_val_acc = []
+
         self.model.train()
         for e in range(num_epochs_vp):
             start_time = time.time()
@@ -102,7 +107,7 @@ class VP4LaneDetection:
                 obj_mask_pred = obj_mask_pred.to(device=self.device)
                 vp_pred = outputs[1]
                 vp_pred = vp_pred.to(device=self.device)
-                loss_vp = self.loss_vp(vp_pred.view(vp.shape), vp)
+                loss_vp = self.loss_vp(vp_pred, vp)
 
 
                 #CHECK THIS BELOW!!!!
@@ -111,8 +116,6 @@ class VP4LaneDetection:
 
                 #Updating training accuracy and training loss
                 train_loss += loss_vp.item()
-                #Using PIXEL-Wise Accuracy!
-                vp_pred = vp_pred.view(vp.shape)
                 train_vp_acc += ((vp_pred == vp).sum().item() )  / (vp.shape[0] * vp.shape[1] * vp.shape[2] * vp.shape[3])
 
                 self.optimizer.zero_grad()
@@ -122,13 +125,26 @@ class VP4LaneDetection:
             train_vp_acc = 100 * train_vp_acc / num_batches
 
             val_obj_mask_loss, validation_loss_vp, val_obj_mask_acc, validation_acc_vp = self.eval(validation_dataloader)
+            
+            vp_phase_train_loss.append(train_loss)
+            vp_phase_train_acc.append(train_vp_acc)
+            vp_phase_val_acc.append(validation_acc_vp)
+            vp_phase_val_loss.append(validation_loss_vp)
+            
+            
             elapsed = time.time() - start_time
             print(
                 "General Training: Epoch {:d} Train loss vp: {:.2f}. Train Accuracy VP: {:.2f}. Validation loss OBJ: {:.2f}. Validation Accuracy OBJ: {:.2f}. Validation Loss VP: {:.2f}. Validation Accuracy VP: {:.2f}. Elapsed time: {:.2f}ms. \n".format(
                 e + 1, train_loss, train_vp_acc, val_obj_mask_loss, val_obj_mask_acc, validation_loss_vp, validation_acc_vp, elapsed)
                 )
 
-        
+        phase2_vp_train_acc = []
+        phase2_vp_val_acc = []
+
+        phase2_mask_train_acc = []
+        phase2_mask_val_acc = []
+
+        phase2_loss = []
         for e in range(num_epochs_general):
             start_time = time.time()
             train_loss = 0
@@ -158,8 +174,8 @@ class VP4LaneDetection:
                 vp_pred = outputs[1]
                 vp_pred = vp_pred.to(device=self.device)
 
-                loss_vp = self.loss_vp(vp_pred.view(vp.shape), vp)
-                loss_obj_mask = self.loss_obj_mask(obj_mask_pred.view(obj_mask.shape),obj_mask)
+                loss_vp = self.loss_vp(vp_pred, vp)
+                loss_obj_mask = self.loss_obj_mask(obj_mask_pred,obj_mask)
                 if(batch_number == 0):
                     w1 = 1 / loss_obj_mask
                     w4 = 1 / loss_vp
@@ -168,9 +184,6 @@ class VP4LaneDetection:
                 loss.backward(retain_graph = True)
                 self.optimizer.step()
                 train_loss+= loss.item()
-
-                vp_pred = vp_pred.view(vp.shape)
-                obj_mask_pred = obj_mask_pred.view(obj_mask.shape)
 
 
                 train_acc_vp_p2 += ((vp_pred == vp).sum().item() )  / (vp.shape[0] * vp.shape[1] * vp.shape[2] * vp.shape[3])
@@ -182,12 +195,29 @@ class VP4LaneDetection:
             train_acc_vp_p2 = 100 * train_acc_vp_p2 / num_batches
             train_acc_obj = 100 * train_acc_obj / num_batches
 
+
+            phase2_loss.append(train_loss)
+            phase2_vp_train_acc.append(train_acc_vp_p2)
+            phase2_mask_train_acc.append(train_acc_obj)
+
             val_obj_mask_loss, validation_loss_vp, val_obj_mask_acc, validation_acc_vp = self.eval(validation_dataloader)
+            
+            phase2_vp_val_acc.append(validation_loss_vp)
+            phase2_mask_val_acc.append(val_obj_mask_acc)
+            
+            
             elapsed = time.time() - start_time
             print(
                 "General Training: Epoch {:d} Train loss: {:.2f}. Train Accuracy Obj Mask: {:.2f}. Train Accuracy VP: {:.2f}. Validation loss OBJ: {:.2f}. Validation Accuracy OBJ: {:.2f}. Validation Loss VP: {:.2f}. Validation Accuracy VP: {:.2f}. Elapsed time: {:.2f}ms. \n".format(
                 e + 1, train_loss, train_acc_obj, train_acc_vp_p2, val_obj_mask_loss, val_obj_mask_acc, validation_loss_vp, validation_acc_vp, elapsed)
                 )
+        
+        np.save("phase2loss.npy",np.array(phase2_loss))
+        np.save("phase2_vp_train_acc.npy",np.array(phase2_vp_train_acc))
+        np.save("phase2_vp_val_acc.npy",np.array(phase2_vp_val_acc))
+
+        np.save("phase2_mask_train_acc.npy",np.array(phase2_mask_train_acc))
+        np.save("phase2_mask_val_acc.npy",np.array(phase2_mask_val_acc))
     
     
     def eval(self, 
@@ -225,14 +255,12 @@ class VP4LaneDetection:
                 vp_pred = outputs[1]
                 vp_pred = vp_pred.to(device=self.device)
 
-                loss_vp = self.loss_vp(vp_pred.view(vp.shape), vp)
-                loss_obj_mask = self.loss_obj_mask(obj_mask_pred.view(obj_mask.shape),obj_mask)
+                loss_vp = self.loss_vp(vp_pred, vp)
+                loss_obj_mask = self.loss_obj_mask(obj_mask_pred,obj_mask)
 
                 vp_loss += loss_vp.item()
                 obj_mask_loss += loss_obj_mask.item()
 
-                obj_mask_pred = obj_mask_pred.view(obj_mask.shape)
-                vp_pred = vp_pred.view(vp.shape)
 
                 vp_acc += ((vp_pred == vp).sum().item() )  / (vp.shape[0] * vp.shape[1] * vp.shape[2] * vp.shape[3])
                 obj_mask_acc += ((obj_mask_pred == obj_mask).sum().item() )  / (obj_mask.shape[0] * obj_mask.shape[1] * obj_mask.shape[2]*obj_mask.shape[3])
