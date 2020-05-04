@@ -213,6 +213,11 @@ class VP4LaneDetection:
                 e + 1, train_loss, train_acc_obj, train_acc_vp_p2, val_obj_mask_loss, val_obj_mask_acc, validation_loss_vp, validation_acc_vp, elapsed)
                 )
         
+        np.save("phase1loss.npy",np.array(vp_phase_train_loss))
+        np.save("phase1_vp_train_acc.npy",np.array(vp_phase_train_acc))
+        np.save("phase1_vp_val_loss.npy",np.array(vp_phase_val_loss))
+        np.save("phase1_vp_val_acc.npy",np.array(vp_phase_val_acc))
+
         np.save("phase2loss.npy",np.array(phase2_loss))
         np.save("phase2_vp_train_acc.npy",np.array(phase2_vp_train_acc))
         np.save("phase2_vp_val_acc.npy",np.array(phase2_vp_val_acc))
