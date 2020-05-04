@@ -29,9 +29,6 @@ class VP4LaneDetection:
         self.model = model
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-        if(torch.cuda.device_count() >= 1):
-            torch.cuda.clear_memory_allocated()
-
         if torch.cuda.device_count() > 1:
             model = nn.DataParallel(model)
 
