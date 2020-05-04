@@ -89,6 +89,7 @@ class VP4LaneDetection:
             print("VP Training Phase")
             print("-----"*10)
             num_batches = len(train_dataloader)
+            print(num_batches)
             for batch_number, (rgb_img, obj_mask ,vp) in enumerate(train_dataloader):
                 print("Training Batch: " + str(batch_number) + " / " + str(num_batches))
                 rgb_img = rgb_img.type(torch.FloatTensor)
@@ -202,7 +203,7 @@ class VP4LaneDetection:
 
             val_obj_mask_loss, validation_loss_vp, val_obj_mask_acc, validation_acc_vp = self.eval(validation_dataloader)
             
-            phase2_vp_val_acc.append(validation_loss_vp)
+            phase2_vp_val_acc.append(validation_acc_vp)
             phase2_mask_val_acc.append(val_obj_mask_acc)
             
             
