@@ -6,7 +6,7 @@
 #SBATCH --account=fc_vivelab
 #
 # Partition:
-#SBATCH --partition=savio2_gpu
+#SBATCH --partition=savio2_1080ti
 #
 # Request one node:
 #SBATCH --nodes=2
