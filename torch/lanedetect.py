@@ -45,12 +45,12 @@ class LaneDetectionHelper:
     def train(self,
             train_dataloader: DataLoader,
             validation_dataloader: DataLoader,
-            num_epochs_vp: int):
+            num_epochs: int):
         """
         Args:
             Train_dataloader: Dataloader for training dataset
             Val_dataloader: Dataloader for validation dataset
-            Num_epochs_vp: Int (Number of Epochs to train)
+            Num_epochs: Int (Number of Epochs to train)
         """
 
         #Checking that args are valid
@@ -80,7 +80,7 @@ class LaneDetectionHelper:
 
                 obj_mask_pred = self.model(rgb_img)
                 obj_mask_pred = obj_mask_pred.to(device=self.device)
-                loss = self.loss(obj_mask_pred.view(obj_mask.shape), obj_mask)
+                loss = self.loss(obj_mask_pred, obj_mask)
 
 
                 loss.backward(retain_graph = True)
@@ -89,19 +89,18 @@ class LaneDetectionHelper:
                 #Updating training accuracy and training loss
                 train_loss += loss.item()
                 #Using PIXEL-Wise Accuracy!
-                obj_mask_pred = obj_mask_pred.view(vp.shape)
-                train_acc += ((obj_mask_pred == obj_mask).sum().item() )  / (obj_mask.shape[0] * obj_mask.shape[1] * obj_mask.shape[2] * obj_mask.shape[3])
+                train_acc += ((obj_mask_pred == obj_mask).sum().item() )  / (obj_mask_pred.shape[0] * obj_mask_pred.shape[1] * obj_mask_pred.shape[2] * obj_mask_pred.shape[3])
 
                 self.optimizer.zero_grad()
 
             #Normalizing by number of batches
             train_loss = train_loss /  num_batches
-            train_acc = 100 * train_vp_acc / num_batches
+            train_acc = 100 * train_acc / num_batches
 
             val_obj_mask_loss, val_obj_mask_acc = self.eval(validation_dataloader)
             elapsed = time.time() - start_time
             print(
-                "General Training: Epoch {:d} Train loss vp: {:.2f}. Train Accuracy VP: {:.2f}. Validation loss OBJ: {:.2f}. Validation Accuracy OBJ: {:.2f}. Elapsed time: {:.2f}ms. \n".format(
+                "General Training: Epoch {:d} Train loss Obj: {:.2f}. Train Accuracy Obj: {:.2f}. Validation loss OBJ: {:.2f}. Validation Accuracy OBJ: {:.2f}. Elapsed time: {:.2f}ms. \n".format(
                 e + 1, train_loss, train_acc, val_obj_mask_loss, val_obj_mask_acc, elapsed)
                 )
 
@@ -135,15 +134,11 @@ class LaneDetectionHelper:
                 obj_mask_pred = self.model(rgb_img)
                 obj_mask_pred = obj_mask_pred.to(device=self.device)
 
-                loss = self.loss(obj_mask_pred.view(obj_mask_pred.shape), obj_mask)
+                loss = self.loss(obj_mask_pred, obj_mask)
+
+                obj_mask_acc += ((obj_mask_pred == obj_mask).sum().item() )  / (obj_mask_pred.shape[0] * obj_mask_pred.shape[1] * obj_mask_pred.shape[2]*obj_mask_pred.shape[3])
 
                 obj_mask_loss += loss.item()
-
-                obj_mask_pred = obj_mask_pred.view(obj_mask.shape)
-
-                obj_mask_acc += ((obj_mask_pred == obj_mask).sum().item() )  / (obj_mask.shape[0] * obj_mask.shape[1] * obj_mask.shape[2]*obj_mask.shape[3])
-
-                obj_mask_loss += loss_obj_mask
 
         obj_mask_loss = obj_mask_loss / num_batches
 
@@ -166,7 +161,7 @@ class LaneDetectionHelper:
         with torch.no_grad():
             for batch_number, rgb_img in enumerate(dataloader):
                 rgb_img = rgb_img.to(device = self.device)
-                obj_mask_pred, obj_mask_pred = self.model(rgb_img)
+                obj_mask_pred = self.model(rgb_img)
                 obj_mask_pred = (obj_mask_pred > 0.5)
                 obj_mask_pred = obj_mask_pred.cpu().numpy()
                 rgb_img = rgb_img.cpu().numpy()

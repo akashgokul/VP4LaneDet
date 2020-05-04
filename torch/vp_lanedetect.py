@@ -104,10 +104,13 @@ class VP4LaneDetection:
                 vp = vp.to(device=self.device)
 
                 outputs = self.model(rgb_img)
+
                 obj_mask_pred = outputs[0]
                 obj_mask_pred = obj_mask_pred.to(device=self.device)
+
                 vp_pred = outputs[1]
                 vp_pred = vp_pred.to(device=self.device)
+
                 loss_vp = self.loss_vp(vp_pred, vp)
 
 
@@ -170,8 +173,10 @@ class VP4LaneDetection:
                 vp = vp.to(device=self.device)
 
                 outputs = self.model(rgb_img)
+
                 obj_mask_pred = outputs[0]
                 obj_mask_pred = obj_mask_pred.to(device=self.device)
+
                 vp_pred = outputs[1]
                 vp_pred = vp_pred.to(device=self.device)
 
@@ -256,8 +261,10 @@ class VP4LaneDetection:
                 vp = vp.to(device=self.device)
 
                 outputs = self.model(rgb_img)
+
                 obj_mask_pred = outputs[0]
                 obj_mask_pred = obj_mask_pred.to(device=self.device)
+                
                 vp_pred = outputs[1]
                 vp_pred = vp_pred.to(device=self.device)
 
