@@ -29,6 +29,9 @@ class VP4LaneDetection:
         self.model = model
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
+        if(torch.cuda.device_count() >= 1):
+            torch.cuda.clear_memory_allocated()
+
         if torch.cuda.device_count() > 1:
             model = nn.DataParallel(model)
 
@@ -149,6 +152,7 @@ class VP4LaneDetection:
         phase2_mask_val_acc = []
 
         phase2_loss = []
+        torch.cuda.empty_cache()
         for e in range(num_epochs_general):
             start_time = time.time()
             train_loss = 0
