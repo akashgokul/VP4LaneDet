@@ -129,6 +129,7 @@ class VPGData(Dataset):
         h = lambda x: 1 if (x == 1) else 0
         h_func = np.vectorize(h)
         vp = h_func(vp)
+        vp = np.resize(vp, (120,160))
         zero_vp = np.zeros_like(vp)
 
         #If no vp exists case:
