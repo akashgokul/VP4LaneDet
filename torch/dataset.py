@@ -37,6 +37,8 @@ class VPGData(Dataset):
         for index, row in self.df_from_csv.iterrows():
             img_name = row[0]
             if(not os.path.exists(self.rootdir + img_name)):
+                print("MISSING!!!!!")
+                print(self.rootdir + img_name)
                 row2delete.append(index)
         self.df_from_csv = self.df_from_csv.drop(index=row2delete)
         self.num_imgs = len(self.df_from_csv.index)
