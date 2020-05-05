@@ -33,13 +33,16 @@ class VPGData(Dataset):
 
         
         #On Savio some data missing, so using this
+        ct = 0
         row2delete = []
         for index, row in self.df_from_csv.iterrows():
             img_name = row[0]
             if(not os.path.exists(self.rootdir + img_name)):
+                ct += 1
                 print("MISSING!!!!!")
                 print(self.rootdir + img_name)
                 row2delete.append(index)
+        print(ct)
         self.df_from_csv = self.df_from_csv.drop(index=row2delete)
         self.num_imgs = len(self.df_from_csv.index)
 
