@@ -105,11 +105,15 @@ class VP4LaneDetection:
 
                 outputs = self.model(rgb_img)
 
+                print("------OBJ Pred & VP Pred------")
                 obj_mask_pred = outputs[0]
                 obj_mask_pred = obj_mask_pred.to(device=self.device)
+                print(torch.unique(obj_mask_pred))
 
                 vp_pred = outputs[1]
                 vp_pred = vp_pred.to(device=self.device)
+                print(torch.unique(vp_pred))
+                print("---------------")
 
                 loss_vp = self.loss_vp(vp_pred, vp)
 
@@ -176,6 +180,7 @@ class VP4LaneDetection:
 
                 outputs = self.model(rgb_img)
 
+                print("------OBJ Pred & VP Pred------")
                 obj_mask_pred = outputs[0]
                 obj_mask_pred = obj_mask_pred.to(device=self.device)
                 print(torch.unique(obj_mask_pred))
@@ -183,6 +188,7 @@ class VP4LaneDetection:
                 vp_pred = outputs[1]
                 vp_pred = vp_pred.to(device=self.device)
                 print(torch.unique(vp_pred))
+                print("---------------")
 
                 loss_vp = self.loss_vp(vp_pred, vp)
                 loss_obj_mask = self.loss_obj_mask(obj_mask_pred,obj_mask)
