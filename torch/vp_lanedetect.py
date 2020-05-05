@@ -105,15 +105,11 @@ class VP4LaneDetection:
 
                 outputs = self.model(rgb_img)
 
-                print("------OBJ Pred & VP Pred------")
                 obj_mask_pred = outputs[0]
                 obj_mask_pred = obj_mask_pred.to(device=self.device)
-                print(torch.unique(obj_mask_pred))
 
                 vp_pred = outputs[1]
                 vp_pred = vp_pred.to(device=self.device)
-                print(torch.unique(vp_pred))
-                print("---------------")
 
                 loss_vp = self.loss_vp(vp_pred, vp)
 
@@ -124,7 +120,8 @@ class VP4LaneDetection:
 
                 #Updating training accuracy and training loss
                 train_loss += loss_vp.item()
-                train_vp_acc += ((vp_pred == vp).sum().item() )  / (vp_pred.shape[0] * vp_pred.shape[1] * vp_pred.shape[2] * vp_pred.shape[3])
+                round_pred_vp = (vp_pred > 0.5).float()
+                train_vp_acc += ((round_pred_vp == vp).sum().item() )  / (vp_pred.shape[0] * vp_pred.shape[1] * vp_pred.shape[2] * vp_pred.shape[3])
 
                 self.optimizer.zero_grad()
 
@@ -180,15 +177,11 @@ class VP4LaneDetection:
 
                 outputs = self.model(rgb_img)
 
-                print("------OBJ Pred & VP Pred------")
                 obj_mask_pred = outputs[0]
                 obj_mask_pred = obj_mask_pred.to(device=self.device)
-                print(torch.unique(obj_mask_pred))
 
                 vp_pred = outputs[1]
                 vp_pred = vp_pred.to(device=self.device)
-                print(torch.unique(vp_pred))
-                print("---------------")
 
                 loss_vp = self.loss_vp(vp_pred, vp)
                 loss_obj_mask = self.loss_obj_mask(obj_mask_pred,obj_mask)
@@ -201,9 +194,11 @@ class VP4LaneDetection:
                 self.optimizer.step()
                 train_loss+= loss.item()
 
+                round_pred_obj = (obj_mask_pred > 0.5).float()
+                round_pred_vp = (vp_pred > 0.5).float()
 
-                train_acc_vp_p2 += ((vp_pred == vp).sum().item() )  / (vp_pred.shape[0] * vp_pred.shape[1] * vp_pred.shape[2] * vp_pred.shape[3])
-                train_acc_obj += ((obj_mask_pred == obj_mask).sum().item() )  / (obj_mask_pred.shape[0] * obj_mask_pred.shape[1] * obj_mask_pred.shape[2]*vp_pred.shape[3])
+                train_acc_vp_p2 += ((round_pred_vp == vp).sum().item() )  / (vp_pred.shape[0] * vp_pred.shape[1] * vp_pred.shape[2] * vp_pred.shape[3])
+                train_acc_obj += ((round_pred_obj == obj_mask).sum().item() )  / (obj_mask_pred.shape[0] * obj_mask_pred.shape[1] * obj_mask_pred.shape[2]*vp_pred.shape[3])
                 self.optimizer.zero_grad()
 
             #Normalizing by number of batches
@@ -285,8 +280,11 @@ class VP4LaneDetection:
                 obj_mask_loss += loss_obj_mask.item()
 
 
-                vp_acc += ((vp_pred == vp).sum().item() )  / (vp_pred.shape[0] * vp_pred.shape[1] * vp_pred.shape[2] * vp_pred.shape[3])
-                obj_mask_acc += ((obj_mask_pred == obj_mask).sum().item() )  / (obj_mask_pred.shape[0] * obj_mask_pred.shape[1] * obj_mask_pred.shape[2]*obj_mask_pred.shape[3])
+                round_pred_obj = (obj_mask_pred > 0.5).float()
+                round_pred_vp = (vp_pred > 0.5).float()
+
+                vp_acc += ((round_pred_vp == vp).sum().item() )  / (vp_pred.shape[0] * vp_pred.shape[1] * vp_pred.shape[2] * vp_pred.shape[3])
+                obj_mask_acc += ((round_pred_obj == obj_mask).sum().item() )  / (obj_mask_pred.shape[0] * obj_mask_pred.shape[1] * obj_mask_pred.shape[2]*obj_mask_pred.shape[3])
 
                 obj_mask_loss += loss_obj_mask
                 vp_loss += loss_vp
