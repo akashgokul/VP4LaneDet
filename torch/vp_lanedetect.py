@@ -173,13 +173,16 @@ class VP4LaneDetection:
                 vp = vp.type(torch.FloatTensor)
                 vp = vp.to(device=self.device)
 
+
                 outputs = self.model(rgb_img)
 
                 obj_mask_pred = outputs[0]
                 obj_mask_pred = obj_mask_pred.to(device=self.device)
+                print(torch.unique(obj_mask_pred))
 
                 vp_pred = outputs[1]
                 vp_pred = vp_pred.to(device=self.device)
+                print(torch.unique(vp_pred))
 
                 loss_vp = self.loss_vp(vp_pred, vp)
                 loss_obj_mask = self.loss_obj_mask(obj_mask_pred,obj_mask)
