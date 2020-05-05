@@ -89,7 +89,6 @@ class VP4LaneDetection:
             print("VP Training Phase")
             print("-----"*10)
             num_batches = len(train_dataloader)
-            print(num_batches)
             for batch_number, (rgb_img, obj_mask ,vp) in enumerate(train_dataloader):
                 print("Training Batch: " + str(batch_number) + " / " + str(num_batches))
                 rgb_img = rgb_img.type(torch.FloatTensor)
@@ -139,7 +138,7 @@ class VP4LaneDetection:
             
             elapsed = time.time() - start_time
             print(
-                "General Training: Epoch {:d} Train loss vp: {:.2f}. Train Accuracy VP: {:.2f}. Validation loss OBJ: {:.2f}. Validation Accuracy OBJ: {:.2f}. Validation Loss VP: {:.2f}. Validation Accuracy VP: {:.2f}. Elapsed time: {:.2f}ms. \n".format(
+                "General Training: Epoch {:d} Train loss VP: {:.2f}. Train Accuracy VP: {:.2f}. Validation loss OBJ: {:.2f}. Validation Accuracy OBJ: {:.2f}. Validation Loss VP: {:.2f}. Validation Accuracy VP: {:.2f}. Elapsed time: {:.2f}ms. \n".format(
                 e + 1, train_loss, train_vp_acc, val_obj_mask_loss, val_obj_mask_acc, validation_loss_vp, validation_acc_vp, elapsed)
                 )
 
