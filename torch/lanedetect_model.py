@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+torch.manual_seed(0)
 
 #Testing VPGNet Arch without VP (for comparision purposes)
 

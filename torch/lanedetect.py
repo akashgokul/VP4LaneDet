@@ -89,7 +89,8 @@ class LaneDetectionHelper:
                 #Updating training accuracy and training loss
                 train_loss += loss.item()
                 #Using PIXEL-Wise Accuracy!
-                train_acc += ((obj_mask_pred == obj_mask).sum().item() )  / (obj_mask_pred.shape[0] * obj_mask_pred.shape[1] * obj_mask_pred.shape[2] * obj_mask_pred.shape[3])
+                round_obj_mask_pred = (obj_mask_pred > 0.5).float()
+                train_acc += ((round_obj_mask_pred == obj_mask).sum().item() )  / (obj_mask_pred.shape[0] * obj_mask_pred.shape[1] * obj_mask_pred.shape[2] * obj_mask_pred.shape[3])
 
                 self.optimizer.zero_grad()
 
@@ -136,7 +137,8 @@ class LaneDetectionHelper:
 
                 loss = self.loss(obj_mask_pred, obj_mask)
 
-                obj_mask_acc += ((obj_mask_pred == obj_mask).sum().item() )  / (obj_mask_pred.shape[0] * obj_mask_pred.shape[1] * obj_mask_pred.shape[2]*obj_mask_pred.shape[3])
+                round_obj_mask_pred = (obj_mask_pred > 0.5).float()
+                obj_mask_acc += ((round_obj_mask_pred == obj_mask).sum().item() )  / (obj_mask_pred.shape[0] * obj_mask_pred.shape[1] * obj_mask_pred.shape[2]*obj_mask_pred.shape[3])
 
                 obj_mask_loss += loss.item()
 
@@ -162,11 +164,15 @@ class LaneDetectionHelper:
             for batch_number, rgb_img in enumerate(dataloader):
                 rgb_img = rgb_img.to(device = self.device)
                 obj_mask_pred = self.model(rgb_img)
-                obj_mask_pred = (obj_mask_pred > 0.5)
+                obj_mask_pred = (obj_mask_pred > 0.5).float()
                 obj_mask_pred = obj_mask_pred.cpu().numpy()
+
                 rgb_img = rgb_img.cpu().numpy()
+                rgb_img = np.rollaxis(rgb_img, 0, 2)
+                obj_mask_pred = np.rollaxis(obj_mask_pred, 0, 2)
+
                 temp_dict = {'img':rgb_img, 'obj_mask_pred': obj_mask_pred}
-                scipy.io.savemat('test_pred/' + str(batch_number) + "_naive_pred.mat", temp_dict)
+                scipy.io.savemat('test_pred/' + str(batch_number) + "_pred.mat", temp_dict)
 
         print("Done Testing!")
         

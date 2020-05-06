@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-
+torch.manual_seed(294)
 #Recreating VPGNet Architecture in Torch, to make it easier to run
 
 class VPGNet(nn.Module):

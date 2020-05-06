@@ -42,7 +42,7 @@ class VPGData(Dataset):
                 print("MISSING!!!!!")
                 print(self.rootdir + img_name)
                 row2delete.append(index)
-        print(ct)
+        print("Number of Missing Files" + str(ct))
         self.df_from_csv = self.df_from_csv.drop(index=row2delete)
         self.num_imgs = len(self.df_from_csv.index)
 

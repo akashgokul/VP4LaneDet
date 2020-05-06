@@ -311,13 +311,19 @@ class VP4LaneDetection:
         with torch.no_grad():
             for batch_number, rgb_img in enumerate(dataloader):
                 rgb_img = rgb_img.to(device = self.device)
+                
                 obj_mask_pred, vp_pred = self.model(rgb_img)
-                obj_mask_pred = (obj_mask_pred > 0.5)
+                obj_mask_pred = (obj_mask_pred > 0.5).float()
                 obj_mask_pred = obj_mask_pred.cpu().numpy()
-                vp_pred = (vp_pred > 0.5)
+
+                vp_pred = (vp_pred > 0.5).float()
                 vp_pred = vp_pred.cpu().numpy()
+
                 rgb_img = rgb_img.cpu().numpy()
-                rgb_img = np.rollaxis(rgb_img, 0, 2) 
+                rgb_img = np.rollaxis(rgb_img, 0, 2)
+                obj_mask_pred = np.rollaxis(obj_mask_pred, 0, 2)
+                vp_pred = np.rollaxis(vp_pred,0,2)
+
                 temp_dict = {'img':rgb_img, 'obj_mask_pred': obj_mask_pred, 'vp_pred':vp_pred}
                 scipy.io.savemat('test_pred/' + str(batch_number) + "_pred.mat", temp_dict)
 
