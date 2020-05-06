@@ -6,7 +6,7 @@
 #SBATCH --account=fc_vivelab
 #
 # Partition:
-#SBATCH --partition=savio2_1080ti
+#SBATCH --partition=savio2
 #
 # Request one node:
 #SBATCH --nodes=2
@@ -14,11 +14,8 @@
 # Request cores (24, for example)
 #SBATCH --ntasks-per-node=1
 #
-#Request GPUs
-#SBATCH --gres=gpu:2
-#
 #Request CPU
-#SBATCH --cpus-per-task=8
+#SBATCH --cpus-per-task=4
 #
 # Wall clock limit:
 #SBATCH --time=72:00:00
