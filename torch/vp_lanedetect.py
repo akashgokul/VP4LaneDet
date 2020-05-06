@@ -123,7 +123,6 @@ class VP4LaneDetection:
                 train_loss += loss_vp.item()
                 round_pred_vp = (vp_pred > 0.5).float()
                 train_vp_acc += ((round_pred_vp == vp).sum().item() )  / (vp_pred.shape[0] * vp_pred.shape[1] * vp_pred.shape[2] * vp_pred.shape[3])
-
                 self.optimizer.zero_grad()
 
             #Normalizing by number of batches
