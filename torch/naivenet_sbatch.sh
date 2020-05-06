@@ -6,7 +6,7 @@
 #SBATCH --account=fc_vivelab
 #
 # Partition:
-#SBATCH --partition=savio2_bigmem
+#SBATCH --partition=savio2
 #
 # Request one node:
 #SBATCH --nodes=1
@@ -16,7 +16,7 @@
 #
 #
 #Request CPU
-#SBATCH --cpus-per-task=4
+#SBATCH --cpus-per-task=20
 #
 # Wall clock limit:
 #SBATCH --time=72:00:00
