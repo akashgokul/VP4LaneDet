@@ -172,7 +172,7 @@ class LaneDetectionHelper:
                 obj_mask_pred = np.rollaxis(obj_mask_pred, 0, 2)
 
                 temp_dict = {'img':rgb_img, 'obj_mask_pred': obj_mask_pred}
-                scipy.io.savemat('test_pred/' + str(batch_number) + "_pred.mat", temp_dict)
+                scipy.io.savemat('naive_test_pred/' + str(batch_number) + "_pred.mat", temp_dict)
 
         print("Done Testing!")
         
