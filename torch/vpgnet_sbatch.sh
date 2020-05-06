@@ -9,7 +9,7 @@
 #SBATCH --partition=savio2
 #
 # Request one node:
-#SBATCH --nodes=2
+#SBATCH --nodes=1
 #
 # Request cores (24, for example)
 #SBATCH --ntasks-per-node=1
