@@ -1,6 +1,6 @@
 #!/bin/bash
 # Job name:
-#SBATCH --job-name=vpgnet_run_may3
+#SBATCH --job-name=naivenet_run
 #
 # Account:
 #SBATCH --account=fc_vivelab
