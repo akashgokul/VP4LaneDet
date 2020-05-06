@@ -102,7 +102,6 @@ class VP4LaneDetection:
                 vp = vp.type(torch.FloatTensor)
                 vp = vp.to(device=self.device)
 
-                print(torch.unique(vp))
 
                 outputs = self.model(rgb_img)
 
