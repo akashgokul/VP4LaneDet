@@ -24,12 +24,12 @@ def main(args):
     if(args.model == 'naive'):
         model = LaneDetect()
         helper = LaneDetectionHelper(model = model, learning_rate = args.learning_rate)
+        helper.train(train_dataloader, valid_dataloader, args.num_epochs_general)
     
     else:
         model = VPGNet()
         helper = VP4LaneDetection(model = model, learning_rate = args.learning_rate)
-
-    helper.train(train_dataloader, valid_dataloader, args.num_epochs_vp, args.num_epochs_general)
+        helper.train(train_dataloader, valid_dataloader, args.num_epochs_vp, args.num_epochs_general)
     helper.test(test_dataloader)
 
 
