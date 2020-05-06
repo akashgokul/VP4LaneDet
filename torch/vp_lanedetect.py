@@ -102,6 +102,8 @@ class VP4LaneDetection:
                 vp = vp.type(torch.FloatTensor)
                 vp = vp.to(device=self.device)
 
+                print(torch.unique(vp))
+
                 outputs = self.model(rgb_img)
 
                 obj_mask_pred = outputs[0]
@@ -311,7 +313,7 @@ class VP4LaneDetection:
         with torch.no_grad():
             for batch_number, rgb_img in enumerate(dataloader):
                 rgb_img = rgb_img.to(device = self.device)
-                
+
                 obj_mask_pred, vp_pred = self.model(rgb_img)
                 obj_mask_pred = (obj_mask_pred > 0.5).float()
                 obj_mask_pred = obj_mask_pred.cpu().numpy()
