@@ -79,7 +79,7 @@ class VP4LaneDetection:
         vp_phase_val_acc = []
 
         self.model.train()
-        for e in range(num_epochs_vp):
+        for e in range(0*num_epochs_vp):
             start_time = time.time()
             train_loss = 0.0
             train_vp_acc = 0.0
@@ -138,7 +138,7 @@ class VP4LaneDetection:
             
             elapsed = time.time() - start_time
             print(
-                "General Training: Epoch {:d} Train loss VP: {:.2f}. Train Accuracy VP: {:.2f}. Validation loss OBJ: {:.2f}. Validation Accuracy OBJ: {:.2f}. Validation Loss VP: {:.2f}. Validation Accuracy VP: {:.2f}. Elapsed time: {:.2f}ms. \n".format(
+                "VP Training: Epoch {:d} Train loss VP: {:.2f}. Train Accuracy VP: {:.2f}. Validation loss OBJ: {:.2f}. Validation Accuracy OBJ: {:.2f}. Validation Loss VP: {:.2f}. Validation Accuracy VP: {:.2f}. Elapsed time: {:.2f}ms. \n".format(
                 e + 1, train_loss, train_vp_acc, val_obj_mask_loss, val_obj_mask_acc, validation_loss_vp, validation_acc_vp, elapsed)
                 )
 
