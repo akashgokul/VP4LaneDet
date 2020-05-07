@@ -184,9 +184,9 @@ class VP4LaneDetection:
 
                 loss_vp = self.loss_vp(vp_pred, vp)
                 loss_obj_mask = self.loss_obj_mask(obj_mask_pred,obj_mask)
-                if(batch_number == 0):
-                    w1 = 1 / loss_obj_mask
-                    w4 = 1 / loss_vp
+                # if(batch_number == 0):
+                #     w1 = 1 / loss_obj_mask
+                #     w4 = 1 / loss_vp
 
                 loss = w1*loss_obj_mask + w4*loss_vp
                 loss.backward(retain_graph = True)
