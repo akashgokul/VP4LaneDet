@@ -79,6 +79,7 @@ class VP4LaneDetection:
         vp_phase_val_acc = []
 
         self.model.train()
+        num_batches = len(train_dataloader)
         for e in range(0*num_epochs_vp):
             start_time = time.time()
             train_loss = 0.0
@@ -88,7 +89,6 @@ class VP4LaneDetection:
             print("-----"*10)
             print("VP Training Phase")
             print("-----"*10)
-            num_batches = len(train_dataloader)
             for batch_number, (rgb_img, obj_mask ,vp) in enumerate(train_dataloader):
                 print("Training Batch: " + str(batch_number) + " / " + str(num_batches))
                 rgb_img = rgb_img.type(torch.FloatTensor)
