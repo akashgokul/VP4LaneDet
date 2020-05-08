@@ -16,7 +16,7 @@
 #
 #
 #Request CPU
-#SBATCH --cpus-per-task=12
+#SBATCH --cpus-per-task=20
 #
 # Wall clock limit:
 #SBATCH --time=72:00:00
