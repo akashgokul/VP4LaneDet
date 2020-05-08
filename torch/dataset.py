@@ -7,6 +7,7 @@ from torchvision import transforms, utils
 import math
 import numpy as np 
 import pandas as pd
+import cv2
 from scipy import misc, io
 
 class VPGData(Dataset):
