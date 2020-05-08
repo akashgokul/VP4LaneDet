@@ -33,16 +33,11 @@ class VPGData(Dataset):
 
         
         #On Savio some data missing, so using this
-        ct = 0
         row2delete = []
         for index, row in self.df_from_csv.iterrows():
             img_name = row[0]
             if(not os.path.exists(self.rootdir + img_name)):
-                ct += 1
-                print("MISSING!!!!!")
-                print(self.rootdir + img_name)
                 row2delete.append(index)
-        print("Number of Missing Files: " + str(ct))
         self.df_from_csv = self.df_from_csv.drop(index=row2delete)
         self.num_imgs = len(self.df_from_csv.index)
 
@@ -112,16 +107,48 @@ class VPGData(Dataset):
         f = lambda x: 1 if (x >= 1 and x <=7) else 0
         f_func = np.vectorize(f)
         obj_mask = f_func(obj_mask)
-        #Resize into 60x80 the size of output
-        obj_mask = np.resize(obj_mask, (120,160))
+        #Resize into 120x160 the size of output
+        #obj_mask = np.resize(obj_mask, (120,160))
+        obj_mask = obj_mask.astype(np.float32)
+        
+        #grid level annotation
+        grid = np.zeros_like(obj_mask)
+        for i in range(480):
+          for j in range(640):
+            if obj_mask[i][j] == 1:
+              grid[i][j] = 1
+              for k in range(3):
+                for l in range(3):
+                  if i-k-1 >= 0  and j-l-1 >= 0:
+                    grid[i-k-1][j-l-1] = 1
+              for k in range(3):
+                for l in range(3):
+                  if i-k-1 >= 0  and j+l+1 < 640:
+                    grid[i-k-1][j+l+1] = 1
+              for k in range(3):
+                for l in range(3):
+                  if i+k+1 < 480  and j-l-1 >= 0:
+                    grid[i+k+1][j-l-1] = 1
+              for k in range(3):
+                for l in range(3):
+                  if i+k+1 < 480  and j+l+1 < 640:
+                    grid[i+k+1][j+l+1] = 1
+        obj_mask = grid
+        # obj_mask_copy = obj_mask #temporary copy
+        # obj_mask_copy = obj_mask_copy.astype(int)
+        obj_mask = cv2.resize(obj_mask, dsize = (160,120),interpolation=cv2.INTER_CUBIC)
+        obj_mask = obj_mask.astype(int)
+        
 
         #Repeating for the second channel which inverts all values in first channel computed above ^
         g = lambda x: 1 if (x == 0) else 0
         g_func = np.vectorize(g)
         obj_channel_2 = np.copy(obj_mask)
         obj_mask_channel_2 = g_func(obj_channel_2)
-        obj_mask_channel_2 = np.resize(obj_mask_channel_2, (120,160))
-
+        #obj_mask_channel_2 = np.resize(obj_mask_channel_2, (120,160))
+        obj_mask_channel_2 = obj_mask_channel_2.astype(np.float32)
+        obj_mask_channel_2 = cv2.resize(obj_mask_channel_2, dsize = (160,120),interpolation=cv2.INTER_CUBIC)
+        obj_mask_channel_2 = obj_mask_channel_2.astype(int)
         #Stacks the channels together to create (120,60,2)
         obj_mask = np.dstack((obj_mask, obj_mask_channel_2))
         obj_mask = np.rollaxis(obj_mask, 2, 0) 
@@ -134,47 +161,62 @@ class VPGData(Dataset):
         h = lambda x: 1 if (x == 1) else 0
         h_func = np.vectorize(h)
         vp = h_func(vp)
-        vp = np.resize(vp, (120,160))
+        #vp = np.resize(vp, (120,160))
         zero_vp = np.zeros_like(vp)
 
         #If no vp exists case:
         #Creates 4 channels of zero and final channel of all 1
         if(np.array_equal(vp, zero_vp)):
-            vp = np.dstack((vp, vp, vp, vp, np.ones_like(zero_vp)))
+            vp = np.resize(vp, (120,160))
+            zero_vp = np.zeros_like(vp)
+            vp = np.dstack((zero_vp, zero_vp, zero_vp, zero_vp, np.ones_like(zero_vp)))
 
         #Case where VP exists
         else:
             #Fifth channel is all zero b/c if VP exists => absence channel = 0
-            fifth_channel = zero_vp
+            
 
             #Finds pixel coordinates of vp
             row_vp, col_vp = np.nonzero(vp)
             row_vp = row_vp[0]
             col_vp = col_vp [0]
+            row_vp = int(row_vp/4)
+            col_vp = int(col_vp/4)
+            vp = np.resize(vp, (120,160))
+            zero_vp = np.zeros_like(vp)
+            first_channel_upperL_corner = np.zeros_like(vp)
+            second_channel_upperR_corner = np.zeros_like(vp)
+            third_channel_lowerL_corner = np.zeros_like(vp)
+            forth_channel_lowerR_corner = np.zeros_like(vp)
+            fifth_channel = zero_vp
+            
+            for i in range(120):
+              for j in range(160):
+           
+                if i <= row_vp and j <= col_vp:
+                  #Creates first channel corresp to upper left corner relative to VP
+                  first_channel_upperL_corner[i][j] = 1
+                if i <= row_vp and j >= col_vp:
+                  #Creates second channel corresp to upper right corner relative to VP
+                  second_channel_upperR_corner[i][j] = 1
+                if i >= row_vp and j <= col_vp:
+                  #Creates third channel corresp to lower left corner relative to VP
+                  third_channel_lowerL_corner[i][j] = 1
+                if i >= row_vp and j >= col_vp:
+                  #Creates fourth channel corresp to lower right corner relative to VP
+                  forth_channel_lowerR_corner[i][j] = 1
 
-            #Creates first channel corresp to upper left corner relative to VP
-            first_channel_upperL_corner = np.ones((row_vp, col_vp, 1))
-            first_channel_upperL_corner.resize(vp.shape)
-
-            #Creates second channel corresp to upper right corner relative to VP
-            second_channel_upperR_corner = np.ones((row_vp,vp.shape[1]-col_vp, 1))
-            second_channel_upperR_corner.resize(vp.shape)
-
-            #Creates third channel corresp to lower left corner relative to VP
-            third_channel_lowerL_corner = np.ones((vp.shape[0] - row_vp, col_vp, 1))
-            third_channel_lowerL_corner.resize(vp.shape)
-
-            #Creates fourth channel corresp to lower right corner relative to VP
-            forth_channel_lowerR_corner = np.ones((vp.shape[0] - row_vp, vp.shape[1]-col_vp, 1))
-            forth_channel_lowerR_corner.resize(vp.shape)
-
+            #first_channel_upperL_corner = np.ones((row_vp, col_vp, 1))
+            #second_channel_upperR_corner = np.ones((row_vp,vp.shape[1]-col_vp, 1))
+            #third_channel_lowerL_corner = np.ones((vp.shape[0] - row_vp, col_vp, 1))
+            #forth_channel_lowerR_corner = np.ones((vp.shape[0] - row_vp, vp.shape[1]-col_vp, 1)
             #Stacks all the channels above
             vp = np.dstack((first_channel_upperL_corner, second_channel_upperR_corner, third_channel_lowerL_corner, forth_channel_lowerR_corner, fifth_channel))
 
         vp = np.rollaxis(vp, 2, 0) 
 
         obj_mask = obj_mask.astype(np.float32)
-        vp = vp.astype(np.float32)
+        vp = vp.astype(np.float32) 
 
         return rgb_img, obj_mask, vp
 

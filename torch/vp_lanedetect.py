@@ -149,7 +149,6 @@ class VP4LaneDetection:
         phase2_mask_val_acc = []
 
         phase2_loss = []
-        torch.cuda.empty_cache()
         for e in range(num_epochs_general):
             start_time = time.time()
             train_loss = 0

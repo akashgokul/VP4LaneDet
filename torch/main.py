@@ -32,6 +32,8 @@ def main(args):
     test_dataset = VPGData(args.root_dir, args.csv_path, transform = None, split = 'test')
     test_dataloader = DataLoader(test_dataset, batch_size = 1, shuffle = True, num_workers = 1)
     helper.test(test_dataloader)
+    test_loss, test_acc = helper.eval(test_dataloader)
+    print("Test Accuracy: " + str(test_acc))
 
 
 

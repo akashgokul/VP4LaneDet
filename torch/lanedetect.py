@@ -149,7 +149,6 @@ class LaneDetectionHelper:
         return obj_mask_loss, 100 * obj_mask_acc
 
 
-    #TODO: Update test function to get test set predictions (Currently very naive)
     def test(self, dataloader: DataLoader):
         """
         Args:
@@ -168,8 +167,8 @@ class LaneDetectionHelper:
                 obj_mask_pred = obj_mask_pred.cpu().numpy()
 
                 rgb_img = rgb_img.cpu().numpy()
-                rgb_img = np.rollaxis(rgb_img, 0, 2)
-                obj_mask_pred = np.rollaxis(obj_mask_pred, 0, 2)
+                # rgb_img = np.rollaxis(rgb_img, 0, 2)
+                # obj_mask_pred = np.rollaxis(obj_mask_pred, 0, 2)
 
                 temp_dict = {'img':rgb_img, 'obj_mask_pred': obj_mask_pred}
                 scipy.io.savemat('naive_test_pred/' + str(batch_number) + "_pred.mat", temp_dict)
