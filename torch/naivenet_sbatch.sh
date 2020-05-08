@@ -6,7 +6,7 @@
 #SBATCH --account=fc_vivelab
 #
 # Partition:
-#SBATCH --partition=savio
+#SBATCH --partition=savio2
 #
 # Request one node:
 #SBATCH --nodes=1
@@ -16,7 +16,7 @@
 #
 #
 #Request CPU
-#SBATCH --cpus-per-task=20
+#SBATCH --cpus-per-task=4
 #
 # Wall clock limit:
 #SBATCH --time=72:00:00
@@ -26,4 +26,4 @@
 ## Command(s) to run (example):
 module load python
 source activate /global/scratch/akashgokul/kaolin_run
-python3 main.py --model naive --root_dir /global/scratch/akashgokul/VPGNet_Yohan --csv_path /global/scratch/akashgokul/VPGNet_data/mat_paths.csv --batch_size 1024 --num_epochs_general 15
+python3 main.py --model naive --root_dir /global/scratch/akashgokul/VPGNet_Yohan --csv_path /global/scratch/akashgokul/VPGNet_data/mat_paths.csv --batch_size 256 --num_epochs_general 15
