@@ -10,7 +10,6 @@ from lanedetect_model import LaneDetect
 class LaneDetectionHelper:
     def __init__(self,
                 model: LaneDetect,
-                loss = nn.BCELoss(),
                 optimizer = None ,
                 learning_rate = 1e-3):
         """
@@ -30,8 +29,6 @@ class LaneDetectionHelper:
             model = nn.DataParallel(model)
 
         model.to(device=self.device)   
-
-        self.loss= loss
 
         if(optimizer == None):
             self.optimizer = torch.optim.Adam(model.parameters(), learning_rate)
@@ -77,13 +74,13 @@ class LaneDetectionHelper:
                 #Need for loss comp.
                 obj_mask = obj_mask.type(torch.FloatTensor)
                 obj_mask = obj_mask.to(device=self.device)
-                print(obj_mask.shape)
 
                 obj_mask_pred = self.model(rgb_img)
                 obj_mask_pred = obj_mask_pred.to(device=self.device)
                 print(obj_mask_pred.shape)
-                print("---------")
-                loss = self.loss(obj_mask_pred, obj_mask)
+
+                loss_func = torch.nn.BCELoss(weights = 9 * obj_mask + torch.ones(obj_mask.shape))
+                loss = loss_func(obj_mask_pred, obj_mask)
 
 
                 loss.backward(retain_graph = True)
