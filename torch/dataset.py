@@ -141,18 +141,20 @@ class VPGData(Dataset):
         obj_mask = obj_mask.astype(int)
         
 
+        #Commented out below b/c only one_channel obj_mask
         #Repeating for the second channel which inverts all values in first channel computed above ^
-        g = lambda x: 1 if (x == 0) else 0
-        g_func = np.vectorize(g)
-        obj_channel_2 = np.copy(obj_mask)
-        obj_mask_channel_2 = g_func(obj_channel_2)
-        #obj_mask_channel_2 = np.resize(obj_mask_channel_2, (120,160))
-        obj_mask_channel_2 = obj_mask_channel_2.astype(np.float32)
-        obj_mask_channel_2 = cv2.resize(obj_mask_channel_2, dsize = (160,120),interpolation=cv2.INTER_CUBIC)
-        obj_mask_channel_2 = obj_mask_channel_2.astype(int)
+        # g = lambda x: 1 if (x == 0) else 0
+        # g_func = np.vectorize(g)
+        # obj_channel_2 = np.copy(obj_mask)
+        # obj_mask_channel_2 = g_func(obj_channel_2)
+        # #obj_mask_channel_2 = np.resize(obj_mask_channel_2, (120,160))
+        # obj_mask_channel_2 = obj_mask_channel_2.astype(np.float32)
+        # obj_mask_channel_2 = cv2.resize(obj_mask_channel_2, dsize = (160,120),interpolation=cv2.INTER_CUBIC)
+        # obj_mask_channel_2 = obj_mask_channel_2.astype(int)
+        
         #Stacks the channels together to create (120,60,2)
         # obj_mask = np.dstack((obj_mask, obj_mask_channel_2))
-        obj_mask = np.rollaxis(obj_mask, 2, 0) 
+        # obj_mask = np.rollaxis(obj_mask, 2, 0) 
 
 
         #Extracts 5th dimension to get vpp
