@@ -151,7 +151,7 @@ class VPGData(Dataset):
         obj_mask_channel_2 = cv2.resize(obj_mask_channel_2, dsize = (160,120),interpolation=cv2.INTER_CUBIC)
         obj_mask_channel_2 = obj_mask_channel_2.astype(int)
         #Stacks the channels together to create (120,60,2)
-        obj_mask = np.dstack((obj_mask, obj_mask_channel_2))
+        # obj_mask = np.dstack((obj_mask, obj_mask_channel_2))
         obj_mask = np.rollaxis(obj_mask, 2, 0) 
 
 

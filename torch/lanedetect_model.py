@@ -43,7 +43,7 @@ class LaneDetect(nn.Module):
             nn.Conv2d(4096, 4096, kernel_size=1, stride=1, padding=0), 
             nn.Dropout(),
             #Conv 8
-            nn.Conv2d(4096, 128, kernel_size=1, stride=1, padding=0), 
+            nn.Conv2d(4096, 64, kernel_size=1, stride=1, padding=0), 
             #Tiling
             #nn.ConvTranspose2d(128, 2, kernel_size = 8)
         )
@@ -67,7 +67,7 @@ class LaneDetect(nn.Module):
         #Pass through the obj_mask branch 
         obj_mask = torch.sigmoid(self.obj_mask(x))
         # #Reshape into (120,160,2)
-        obj_mask = obj_mask.view(-1,2,120,160)
+        obj_mask = obj_mask.view(-1,1,120,160)
 
         #Pass through the vp branch 
         # vp = torch.sigmoid(self.vp(x))
