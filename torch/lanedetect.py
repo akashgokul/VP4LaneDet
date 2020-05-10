@@ -6,6 +6,7 @@ import numpy as np
 import scipy.io
 import time
 from lanedetect_model import LaneDetect
+from torchvision import transforms, utils
 
 class LaneDetectionHelper:
     def __init__(self,
@@ -69,7 +70,19 @@ class LaneDetectionHelper:
             for batch_number, (rgb_img, obj_mask ,_) in enumerate(train_dataloader):
                 print("Training Batch: " + str(batch_number) + " / " + str(num_batches))
                 rgb_img = rgb_img.type(torch.FloatTensor)
-                rgb_img = rgb_img.to(device=self.device)
+
+                #Normalizing img
+                batch = rgb_img.view(rgb_img.size(0), rgb_img.size(1), -1).to(device=self.device)
+                nimages += batch.size(0).to(device=self.device)
+                mean += batch.mean(2).sum(0).to(device=self.device)
+                std += batch.std(2).sum(0).to(device=self.device)
+
+                # Final step
+                mean /= nimages
+                std /= nimages
+
+                transform = transforms.Normalize(mean, std)
+                rgb_img = transform(rgb_img).to(device=self.device)
 
                 #Need for loss comp.
                 obj_mask = obj_mask.type(torch.FloatTensor)
@@ -83,7 +96,7 @@ class LaneDetectionHelper:
                 # loss_weights = 9 * obj_mask + torch.ones(obj_mask.shape).to(device=self.device)
                 # loss_weights.to(device=self.device)
                 # loss_func = torch.nn.BCELoss(weight = loss_weights)
-                loss_func = torch.nn.MSELoss()
+                loss_func = torch.nn.BCEWithLogitsLoss()
                 loss = loss_func(obj_mask_pred, obj_mask)
                 print("------")
 
@@ -131,7 +144,20 @@ class LaneDetectionHelper:
             for batch_number, (rgb_img,obj_mask, _) in enumerate(dataloader):
                 print("Eval Batch: " + str(batch_number) + " / " + str(num_batches))
                 rgb_img = rgb_img.type(torch.FloatTensor)
-                rgb_img = rgb_img.to(device=self.device)
+                rgb_img = rgb_img.type(torch.FloatTensor)
+
+                #Normalizing img
+                batch = rgb_img.view(rgb_img.size(0), rgb_img.size(1), -1).to(device=self.device)
+                nimages += batch.size(0).to(device=self.device)
+                mean += batch.mean(2).sum(0).to(device=self.device)
+                std += batch.std(2).sum(0).to(device=self.device)
+
+                # Final step
+                mean /= nimages
+                std /= nimages
+
+                transform = transforms.Normalize(mean, std)
+                rgb_img = transform(rgb_img).to(device=self.device)
 
                 obj_mask = obj_mask.type(torch.FloatTensor)
                 obj_mask = obj_mask.to(device=self.device)
@@ -143,7 +169,7 @@ class LaneDetectionHelper:
                 # loss_weights = 9 * obj_mask + torch.ones(obj_mask.shape).to(device=self.device)
                 # loss_weights.to(device=self.device)
                 # loss_func = torch.nn.BCELoss(weight = loss_weights)
-                loss_func = torch.nn.MSELoss()
+                loss_func = torch.nn.BCEWithLogitsLoss()
                 loss = loss_func(obj_mask_pred, obj_mask)
 
                 round_obj_mask_pred = (obj_mask_pred > 0.5).float()
@@ -172,7 +198,21 @@ class LaneDetectionHelper:
             num_batches = len(dataloader)
             for batch_number, rgb_img in enumerate(dataloader):
                 print("Training Batch: " + str(batch_number) + " / " + str(num_batches))
-                rgb_img = rgb_img.to(device = self.device)
+                rgb_img = rgb_img.type(torch.FloatTensor)
+
+                #Normalizing img
+                batch = rgb_img.view(rgb_img.size(0), rgb_img.size(1), -1).to(device=self.device)
+                nimages += batch.size(0).to(device=self.device)
+                mean += batch.mean(2).sum(0).to(device=self.device)
+                std += batch.std(2).sum(0).to(device=self.device)
+
+                # Final step
+                mean /= nimages
+                std /= nimages
+
+                transform = transforms.Normalize(mean, std)
+                rgb_img = transform(rgb_img).to(device=self.device)
+
                 obj_mask_pred = self.model(rgb_img)
                 obj_mask_pred = (obj_mask_pred > 0.5).float()
                 obj_mask_pred = obj_mask_pred.cpu().numpy()
@@ -180,7 +220,7 @@ class LaneDetectionHelper:
                 rgb_img = rgb_img.cpu().numpy()
 
                 temp_dict = {'img':rgb_img, 'obj_mask_pred': obj_mask_pred}
-                scipy.io.savemat('naive_test_pred/' + str(batch_number) + "_pred.mat", temp_dict)
+                scipy.io.savemat('naive_test_pred2/' + str(batch_number) + "_pred.mat", temp_dict)
 
         print("Done Testing!")
         
