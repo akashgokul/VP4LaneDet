@@ -137,9 +137,10 @@ class LaneDetectionHelper:
                 obj_mask_pred = self.model(rgb_img)
                 obj_mask_pred = obj_mask_pred.to(device=self.device)
 
-                loss_weights = 9 * obj_mask + torch.ones(obj_mask.shape).to(device=self.device)
-                loss_weights.to(device=self.device)
-                loss_func = torch.nn.BCELoss(weight = loss_weights)
+                # loss_weights = 9 * obj_mask + torch.ones(obj_mask.shape).to(device=self.device)
+                # loss_weights.to(device=self.device)
+                # loss_func = torch.nn.BCELoss(weight = loss_weights)
+                loss_func = torch.nn.CrossEntropyLoss()
                 loss = loss_func(obj_mask_pred, obj_mask)
 
                 round_obj_mask_pred = (obj_mask_pred > 0.5).float()
@@ -165,15 +166,15 @@ class LaneDetectionHelper:
 
         self.model.eval()
         with torch.no_grad():
+            num_batches = len(dataloader)
             for batch_number, rgb_img in enumerate(dataloader):
+                print("Training Batch: " + str(batch_number) + " / " + str(num_batches))
                 rgb_img = rgb_img.to(device = self.device)
                 obj_mask_pred = self.model(rgb_img)
                 obj_mask_pred = (obj_mask_pred > 0.5).float()
                 obj_mask_pred = obj_mask_pred.cpu().numpy()
 
                 rgb_img = rgb_img.cpu().numpy()
-                # rgb_img = np.rollaxis(rgb_img, 0, 2)
-                # obj_mask_pred = np.rollaxis(obj_mask_pred, 0, 2)
 
                 temp_dict = {'img':rgb_img, 'obj_mask_pred': obj_mask_pred}
                 scipy.io.savemat('naive_test_pred/' + str(batch_number) + "_pred.mat", temp_dict)
