@@ -97,7 +97,7 @@ class VPGData(Dataset):
         rgb_img = img[:,:,:3]
         mean = np.mean(rgb_img,axis=2)
         std = np.std(rgb_img,axis=2)
-        rgb_img = np.rollaxis(rgb_img, 2, 0) 
+        # rgb_img = np.rollaxis(rgb_img, 2, 0) 
         rgb_img = rgb_img.astype(np.float32)
 
         if(self.split == 'test'):
@@ -227,7 +227,6 @@ class VPGData(Dataset):
             transforms.ToTensor(), 
             transforms.Normalize(mean=mean, std=std)])
 
-        print("-----"*10)
         print(mean)
         print(std)
         return transform(rgb_img), obj_mask, vp
