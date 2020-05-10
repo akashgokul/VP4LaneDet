@@ -77,9 +77,9 @@ class LaneDetectionHelper:
 
                 #Normalizing img
                 batch = rgb_img.view(rgb_img.size(0), rgb_img.size(1), -1).to(device=self.device)
-                nimages += batch.size(0).to(device=self.device)
-                mean += batch.mean(2).sum(0).to(device=self.device)
-                std += batch.std(2).sum(0).to(device=self.device)
+                nimages += batch.size(0)
+                mean += batch.mean(2).sum(0)
+                std += batch.std(2).sum(0)
 
                 # Final step
                 mean /= nimages
@@ -154,9 +154,9 @@ class LaneDetectionHelper:
 
                 #Normalizing img
                 batch = rgb_img.view(rgb_img.size(0), rgb_img.size(1), -1).to(device=self.device)
-                nimages += batch.size(0).to(device=self.device)
-                mean += batch.mean(2).sum(0).to(device=self.device)
-                std += batch.std(2).sum(0).to(device=self.device)
+                nimages += batch.size(0)
+                mean += batch.mean(2).sum(0)
+                std += batch.std(2).sum(0)
 
                 # Final step
                 mean /= nimages
@@ -211,9 +211,9 @@ class LaneDetectionHelper:
 
                 #Normalizing img
                 batch = rgb_img.view(rgb_img.size(0), rgb_img.size(1), -1).to(device=self.device)
-                nimages += batch.size(0).to(device=self.device)
-                mean += batch.mean(2).sum(0).to(device=self.device)
-                std += batch.std(2).sum(0).to(device=self.device)
+                nimages += batch.size(0)
+                mean += batch.mean(2).sum(0)
+                std += batch.std(2).sum(0)
 
                 # Final step
                 mean /= nimages
