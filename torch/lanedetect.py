@@ -56,9 +56,6 @@ class LaneDetectionHelper:
         assert type(validation_dataloader) == DataLoader
         assert num_epochs > 0
 
-        nimages = 0
-        mean = 0.
-        std = 0.
 
         self.model.train()
         for e in range(num_epochs):
@@ -74,21 +71,7 @@ class LaneDetectionHelper:
             for batch_number, (rgb_img, obj_mask ,_) in enumerate(train_dataloader):
                 print("Training Batch: " + str(batch_number) + " / " + str(num_batches))
                 rgb_img = rgb_img.type(torch.FloatTensor)
-
-                #Normalizing img
-                batch = rgb_img.view(rgb_img.size(0), rgb_img.size(1), -1).to(device=self.device)
-                nimages += batch.size(0)
-                mean += batch.mean(2).sum(0)
-                std += batch.std(2).sum(0)
-
-                # Final step
-                mean /= nimages
-                std /= nimages
-
-                transform = transforms.Compose([
-                            transforms.ToTensor(), 
-                            transforms.Normalize(mean=mean, std=std)])
-                rgb_img = transform(rgb_img).to(device=self.device)
+                rgb_img = rgb_img.to(device=self.device)
 
                 #Need for loss comp.
                 obj_mask = obj_mask.type(torch.FloatTensor)
@@ -145,29 +128,15 @@ class LaneDetectionHelper:
         with torch.no_grad():
             obj_mask_loss = 0
             obj_mask_acc = 0.0
-            nimages = 0
-            mean = 0.
-            std = 0.
+
             num_batches = len(dataloader)
             for batch_number, (rgb_img,obj_mask, _) in enumerate(dataloader):
                 print("Eval Batch: " + str(batch_number) + " / " + str(num_batches))
                 rgb_img = rgb_img.type(torch.FloatTensor)
                 rgb_img = rgb_img.type(torch.FloatTensor)
 
-                #Normalizing img
-                batch = rgb_img.view(rgb_img.size(0), rgb_img.size(1), -1).to(device=self.device)
-                nimages += batch.size(0)
-                mean += batch.mean(2).sum(0)
-                std += batch.std(2).sum(0)
 
-                # Final step
-                mean /= nimages
-                std /= nimages
-
-                transform = transforms.Compose([
-                            transforms.ToTensor(), 
-                            transforms.Normalize(mean=mean, std=std)])
-                rgb_img = transform(rgb_img).to(device=self.device)
+                rgb_img = rgb_img.to(device=self.device)
 
                 obj_mask = obj_mask.type(torch.FloatTensor)
                 obj_mask = obj_mask.to(device=self.device)
@@ -202,9 +171,7 @@ class LaneDetectionHelper:
         Note: This function returns list of prediction of obj_maskmasks on testset
 
         """
-        nimages = 0
-        mean = 0.
-        std = 0.
+
 
         self.model.eval()
         with torch.no_grad():
@@ -212,21 +179,7 @@ class LaneDetectionHelper:
             for batch_number, rgb_img in enumerate(dataloader):
                 print("Training Batch: " + str(batch_number) + " / " + str(num_batches))
                 rgb_img = rgb_img.type(torch.FloatTensor)
-
-                #Normalizing img
-                batch = rgb_img.view(rgb_img.size(0), rgb_img.size(1), -1).to(device=self.device)
-                nimages += batch.size(0)
-                mean += batch.mean(2).sum(0)
-                std += batch.std(2).sum(0)
-
-                # Final step
-                mean /= nimages
-                std /= nimages
-
-                transform = transforms.Compose([
-                            transforms.ToTensor(), 
-                            transforms.Normalize(mean=mean, std=std)])
-                rgb_img = transform(rgb_img).to(device=self.device)
+                rgb_img = rgb_img.to(device=self.device)
 
                 obj_mask_pred = self.model(rgb_img)
                 obj_mask_pred = (obj_mask_pred > 0.5).float()

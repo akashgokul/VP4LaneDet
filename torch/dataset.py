@@ -95,6 +95,8 @@ class VPGData(Dataset):
 
         #Slices first 3 channels for the rgb portion of img
         rgb_img = img[:,:,:3]
+        mean = np.mean(rgb_img,axis=2)
+        std = np.std(rgb_img,axis=2)
         rgb_img = np.rollaxis(rgb_img, 2, 0) 
         rgb_img = rgb_img.astype(np.float32)
 
@@ -221,7 +223,11 @@ class VPGData(Dataset):
         obj_mask = obj_mask.astype(np.float32)
         vp = vp.astype(np.float32) 
 
-        return rgb_img, obj_mask, vp
+        transform = transforms.Compose([
+            transforms.ToTensor(), 
+            transforms.Normalize(mean=mean, std=std)])
+
+        return transform(rgb_img), obj_mask, vp
 
 
 
