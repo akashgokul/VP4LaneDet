@@ -137,7 +137,10 @@ class LaneDetectionHelper:
                 obj_mask_pred = self.model(rgb_img)
                 obj_mask_pred = obj_mask_pred.to(device=self.device)
 
-                loss = self.loss(obj_mask_pred, obj_mask)
+                loss_weights = 9 * obj_mask + torch.ones(obj_mask.shape).to(device=self.device)
+                loss_weights.to(device=self.device)
+                loss_func = torch.nn.BCELoss(weight = loss_weights)
+                loss = loss_func(obj_mask_pred, obj_mask)
 
                 round_obj_mask_pred = (obj_mask_pred > 0.5).float()
                 obj_mask_acc += ((round_obj_mask_pred == obj_mask).sum().item() )  / (obj_mask_pred.shape[0] * obj_mask_pred.shape[1] * obj_mask_pred.shape[2])
