@@ -56,6 +56,10 @@ class LaneDetectionHelper:
         assert type(validation_dataloader) == DataLoader
         assert num_epochs > 0
 
+        nimages = 0
+        mean = 0.
+        std = 0.
+
         self.model.train()
         for e in range(num_epochs):
             start_time = time.time()
@@ -139,7 +143,9 @@ class LaneDetectionHelper:
         with torch.no_grad():
             obj_mask_loss = 0
             obj_mask_acc = 0.0
-
+            nimages = 0
+            mean = 0.
+            std = 0.
             num_batches = len(dataloader)
             for batch_number, (rgb_img,obj_mask, _) in enumerate(dataloader):
                 print("Eval Batch: " + str(batch_number) + " / " + str(num_batches))
@@ -192,6 +198,9 @@ class LaneDetectionHelper:
         Note: This function returns list of prediction of obj_maskmasks on testset
 
         """
+        nimages = 0
+        mean = 0.
+        std = 0.
 
         self.model.eval()
         with torch.no_grad():
