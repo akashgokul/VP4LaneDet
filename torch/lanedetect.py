@@ -74,6 +74,7 @@ class LaneDetectionHelper:
                 #Need for loss comp.
                 obj_mask = obj_mask.type(torch.FloatTensor)
                 obj_mask = obj_mask.to(device=self.device)
+                print(obj_mask.shape)
 
                 obj_mask_pred = self.model(rgb_img)
                 obj_mask_pred = obj_mask_pred.to(device=self.device)
@@ -82,8 +83,9 @@ class LaneDetectionHelper:
                 # loss_weights = 9 * obj_mask + torch.ones(obj_mask.shape).to(device=self.device)
                 # loss_weights.to(device=self.device)
                 # loss_func = torch.nn.BCELoss(weight = loss_weights)
-                loss_func = torch.nn.CrossEntropyLoss()
+                loss_func = torch.nn.MSELoss()
                 loss = loss_func(obj_mask_pred, obj_mask)
+                print("------")
 
 
                 loss.backward(retain_graph = True)
@@ -141,7 +143,7 @@ class LaneDetectionHelper:
                 # loss_weights = 9 * obj_mask + torch.ones(obj_mask.shape).to(device=self.device)
                 # loss_weights.to(device=self.device)
                 # loss_func = torch.nn.BCELoss(weight = loss_weights)
-                loss_func = torch.nn.CrossEntropyLoss()
+                loss_func = torch.nn.MSELoss()
                 loss = loss_func(obj_mask_pred, obj_mask)
 
                 round_obj_mask_pred = (obj_mask_pred > 0.5).float()
