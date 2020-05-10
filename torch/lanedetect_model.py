@@ -65,7 +65,7 @@ class LaneDetect(nn.Module):
         x = self.shared(x)
 
         #Pass through the obj_mask branch 
-        obj_mask = torch.sigmoid(self.obj_mask(x))
+        obj_mask = self.obj_mask(x)
         # #Reshape into (120,160,2)
         obj_mask = obj_mask.view(-1,120,160)
 
