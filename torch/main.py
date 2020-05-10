@@ -8,13 +8,17 @@ from dataset import VPGData
 
 from lanedetect_model import LaneDetect
 from lanedetect import LaneDetectionHelper
+from torchvision import transforms, utils
 
 
 def main(args):
 
-    #TODO: Implement typical torch transform (e.g. normalize img)
-    train_dataset = VPGData(args.root_dir, args.csv_path ,transform = None, split = 'train')
-    valid_dataset = VPGData(args.root_dir, args.csv_path, transform = None, split = 'validation')
+    transform = transforms.Compose([
+        transforms.ToTensor(),
+        transforms.Normalize([72.61509, 73.82126, 71.80697], [66.72383, 67.54961, 69.95039])
+    ])
+    train_dataset = VPGData(args.root_dir, args.csv_path ,transform = transform, split = 'train')
+    valid_dataset = VPGData(args.root_dir, args.csv_path, transform = transform, split = 'validation')
 
     train_dataloader = DataLoader(train_dataset, batch_size = args.batch_size, shuffle = True, num_workers = 1)
     valid_dataloader = DataLoader(valid_dataset, batch_size = 1, shuffle = True, num_workers = 1)
@@ -29,7 +33,7 @@ def main(args):
         helper = VP4LaneDetection(model = model, learning_rate = args.learning_rate)
         helper.train(train_dataloader, valid_dataloader, args.num_epochs_vp, args.num_epochs_general)
     
-    test_dataset = VPGData(args.root_dir, args.csv_path, transform = None, split = 'test')
+    test_dataset = VPGData(args.root_dir, args.csv_path, transform = transform, split = 'test')
     test_dataloader = DataLoader(test_dataset, batch_size = 1, shuffle = True, num_workers = 1)
     helper.test(test_dataloader)
     # test_loss, test_acc = helper.eval(test_dataloader)

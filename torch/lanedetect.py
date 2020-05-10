@@ -76,7 +76,6 @@ class LaneDetectionHelper:
                 #Need for loss comp.
                 obj_mask = obj_mask.type(torch.FloatTensor)
                 obj_mask = obj_mask.to(device=self.device)
-                print(obj_mask.shape)
 
                 obj_mask_pred = self.model(rgb_img)
                 obj_mask_pred = obj_mask_pred.to(device=self.device)
