@@ -138,7 +138,7 @@ class LaneDetectionHelper:
                 loss = self.loss(obj_mask_pred, obj_mask)
 
                 round_obj_mask_pred = (obj_mask_pred > 0.5).float()
-                obj_mask_acc += ((round_obj_mask_pred == obj_mask).sum().item() )  / (obj_mask_pred.shape[0] * obj_mask_pred.shape[1] * obj_mask_pred.shape[2]*obj_mask_pred.shape[3])
+                obj_mask_acc += ((round_obj_mask_pred == obj_mask).sum().item() )  / (obj_mask_pred.shape[0] * obj_mask_pred.shape[1] * obj_mask_pred.shape[2])
 
                 obj_mask_loss += loss.item()
 
