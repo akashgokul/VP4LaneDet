@@ -90,7 +90,7 @@ class LaneDetectionHelper:
                 train_loss += loss.item()
                 #Using PIXEL-Wise Accuracy!
                 round_obj_mask_pred = (obj_mask_pred > 0.5).float()
-                train_acc += ((round_obj_mask_pred == obj_mask).sum().item() )  / (obj_mask_pred.shape[0] * obj_mask_pred.shape[1] * obj_mask_pred.shape[2] * obj_mask_pred.shape[3])
+                train_acc += ((round_obj_mask_pred == obj_mask).sum().item() )  / (obj_mask_pred.shape[0] * obj_mask_pred.shape[1] * obj_mask_pred.shape[2])
 
                 self.optimizer.zero_grad()
 
