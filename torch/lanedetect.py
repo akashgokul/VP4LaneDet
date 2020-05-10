@@ -79,7 +79,9 @@ class LaneDetectionHelper:
                 obj_mask_pred = obj_mask_pred.to(device=self.device)
                 print(obj_mask_pred.shape)
 
-                loss_func = torch.nn.BCELoss(weight = 9 * obj_mask + torch.ones(obj_mask.shape))
+                loss_weights = 9 * obj_mask + torch.ones(obj_mask.shape)
+                loss_weights.to(device=self.device)
+                loss_func = torch.nn.BCELoss(weight = loss_weights)
                 loss = loss_func(obj_mask_pred, obj_mask)
 
 
