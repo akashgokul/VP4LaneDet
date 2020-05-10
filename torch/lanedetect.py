@@ -85,7 +85,9 @@ class LaneDetectionHelper:
                 mean /= nimages
                 std /= nimages
 
-                transform = transforms.Normalize(mean, std)
+                transform = transforms.Compose([
+                            transforms.ToTensor(), 
+                            transforms.Normalize(mean=mean, std=std)])
                 rgb_img = transform(rgb_img).to(device=self.device)
 
                 #Need for loss comp.
@@ -162,7 +164,9 @@ class LaneDetectionHelper:
                 mean /= nimages
                 std /= nimages
 
-                transform = transforms.Normalize(mean, std)
+                transform = transforms.Compose([
+                            transforms.ToTensor(), 
+                            transforms.Normalize(mean=mean, std=std)])
                 rgb_img = transform(rgb_img).to(device=self.device)
 
                 obj_mask = obj_mask.type(torch.FloatTensor)
@@ -219,7 +223,9 @@ class LaneDetectionHelper:
                 mean /= nimages
                 std /= nimages
 
-                transform = transforms.Normalize(mean, std)
+                transform = transforms.Compose([
+                            transforms.ToTensor(), 
+                            transforms.Normalize(mean=mean, std=std)])
                 rgb_img = transform(rgb_img).to(device=self.device)
 
                 obj_mask_pred = self.model(rgb_img)
