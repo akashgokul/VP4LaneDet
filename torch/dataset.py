@@ -227,6 +227,7 @@ class VPGData(Dataset):
             transforms.ToTensor(), 
             transforms.Normalize(mean=mean, std=std)])
 
+        print("-----"*10)
         print(mean)
         print(std)
         return transform(rgb_img), obj_mask, vp
