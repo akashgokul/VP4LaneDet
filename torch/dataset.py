@@ -100,8 +100,11 @@ class VPGData(Dataset):
         # rgb_img = np.rollaxis(rgb_img, 2, 0) 
         rgb_img = rgb_img.astype(np.float32)
 
-        if(self.split == 'test'):
-            return rgb_img
+        print("----")
+        print(mean)
+        print(std)
+        print("-----")
+
 
         #Slices only the 4th channel (0-indexed) for the obj mask
         obj_mask = img[:, :, 3]
@@ -227,8 +230,9 @@ class VPGData(Dataset):
             transforms.ToTensor(), 
             transforms.Normalize(mean=mean, std=std)])
 
-        print(mean)
-        print(std)
+        if(self.split == 'test'):
+            return transform(rgb_img)
+
         return transform(rgb_img), obj_mask, vp
 
 
