@@ -227,8 +227,9 @@ class VPGData(Dataset):
         vp = vp.astype(np.float32) 
 
         transform = transforms.Compose([
-            transforms.ToTensor(), 
-            transforms.Normalize(mean=mean, std=std)])
+            transforms.ToTensor() #, 
+            # transforms.Normalize(mean=mean, std=std)
+            ])
 
         if(self.split == 'test'):
             return transform(rgb_img)
