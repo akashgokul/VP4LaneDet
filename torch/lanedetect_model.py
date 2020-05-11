@@ -67,6 +67,7 @@ class LaneDetect(nn.Module):
         #Pass through the obj_mask branch 
         obj_mask = self.obj_mask(x)
         # #Reshape into (120,160,2)
+        print(obj_mask.shape)
         obj_mask = obj_mask.view(-1,120,160)
 
         #Pass through the vp branch 
