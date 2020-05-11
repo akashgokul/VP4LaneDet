@@ -6,16 +6,13 @@
 #SBATCH --account=fc_vivelab
 #
 # Partition:
-#SBATCH --partition=savio2_gpu
+#SBATCH --partition=savio2_htc
 #
 # Request one node:
 #SBATCH --nodes=1
 #
 # Request cores (24, for example)
 #SBATCH --ntasks-per-node=1
-#
-#Request GPUs
-#SBATCH --gres=gpu:1
 #
 #Request CPU
 #SBATCH --cpus-per-task=4
