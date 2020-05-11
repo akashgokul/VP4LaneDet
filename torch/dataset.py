@@ -213,17 +213,19 @@ class VPGData(Dataset):
             #Stacks all the channels above
             vp = np.dstack((first_channel_upperL_corner, second_channel_upperR_corner, third_channel_lowerL_corner, forth_channel_lowerR_corner, fifth_channel))
 
-        vp = np.rollaxis(vp, 2, 0) 
+        # vp = np.rollaxis(vp, 2, 0) 
 
-        obj_mask = obj_mask.astype(np.float32)
-        vp = vp.astype(np.float32) 
+        # obj_mask = obj_mask.astype(np.float32)
+        # vp = vp.astype(np.float32) 
 
         if(self.transform):
             rgb_img = self.transform(rgb_img)
 
         if(self.split == 'test'):
             return rgb_img
-        return rgb_img, obj_mask, vp
+        
+        tensor_transform = transforms.ToTensor()
+        return rgb_img, tensor_transform(obj_mask), tensor_transform(vp)
 
 
 
