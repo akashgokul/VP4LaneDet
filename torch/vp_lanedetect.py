@@ -56,15 +56,7 @@ class VP4LaneDetection:
             Train_dataloader: Dataloader for training dataset
             Val_dataloader: Dataloader for validation dataset
             Num_epochs_vp: Number of epochs to train vpp branch (cross-entropy)
-            Num_epochs_general: Number of epochs to train entire model (L1 obj_mask Loss)
-        """
-
-        """
-        Args:
-            Train_dataloader: Dataloader for training dataset
-            Val_dataloader: Dataloader for validation dataset
-            Num_epochs_vp: Number of epochs to train vpp branch (cross-entropy)
-            Num_epochs_general: Number of epochs to train entire model (L1 obj_mask Loss)
+            Num_epochs_general: Number of epochs to train entire model
         """
 
         #Checking that args are valid
