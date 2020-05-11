@@ -25,4 +25,4 @@
 ## Command(s) to run (example):
 module load python
 source activate /global/scratch/akashgokul/kaolin_run
-python3 main.py --model naive --root_dir /global/scratch/akashgokul/VPGNet_Yohan --csv_path /global/scratch/akashgokul/VPGNet_data/mat_paths.csv --batch_size 64 --num_epochs_general 1
+python3 main.py --model naive --root_dir /global/scratch/akashgokul/VPGNet_Yohan --csv_path /global/scratch/akashgokul/VPGNet_data/mat_paths.csv --batch_size 64 --num_epochs_general 2
