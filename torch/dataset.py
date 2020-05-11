@@ -95,8 +95,8 @@ class VPGData(Dataset):
 
         #Slices first 3 channels for the rgb portion of img
         rgb_img = img[:,:,:3]
-        rgb_img = np.rollaxis(rgb_img, 2, 0) 
-        rgb_img = rgb_img.astype(np.float32)
+        # rgb_img = np.rollaxis(rgb_img, 2, 0) 
+        # rgb_img = rgb_img.astype(np.float32)
 
         #Slices only the 4th channel (0-indexed) for the obj mask
         obj_mask = img[:, :, 3]
@@ -218,7 +218,7 @@ class VPGData(Dataset):
         obj_mask = obj_mask.astype(np.float32)
         vp = vp.astype(np.float32) 
 
-        if(self.transform != None):
+        if(self.transform):
             rgb_img = self.transform(rgb_img)
 
         if(self.split == 'test'):
