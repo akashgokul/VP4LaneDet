@@ -45,7 +45,7 @@ class LaneDetect(nn.Module):
             #Conv 8
             nn.Conv2d(4096, 64, kernel_size=1, stride=1, padding=0), 
             #Tiling
-            nn.ConvTranspose2d(64, 2, kernel_size = 8, stride=1)
+            nn.ConvTranspose2d(64, 1, kernel_size = 8, stride=8)
         )
         # self.vp = nn.Sequential(
         #     #Conv 7
