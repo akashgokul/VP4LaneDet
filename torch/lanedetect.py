@@ -131,6 +131,8 @@ class LaneDetectionHelper:
                 e + 1, train_loss, train_acc, val_obj_mask_loss, val_obj_mask_acc, elapsed)
                 )
             
+            if(val_obj_mask_acc >= 90):
+                break
         
         np.save('naive_losses_lst',np.array(losses_lst))
         np.save('naive_train_losses_lst',np.array(train_loss_lst))
