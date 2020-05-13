@@ -130,6 +130,9 @@ class LaneDetectionHelper:
                 "General Training: Epoch {:d} Train loss Obj: {:.2f}. Train Accuracy Obj: {:.2f}. Validation loss OBJ: {:.2f}. Validation Accuracy OBJ: {:.2f}. Elapsed time: {:.2f}ms. \n".format(
                 e + 1, train_loss, train_acc, val_obj_mask_loss, val_obj_mask_acc, elapsed)
                 )
+            
+            if(val_obj_mask_acc >= 90):
+                break
         
         np.save('naive_losses_lst',np.array(losses_lst))
         np.save('naive_train_losses_lst',np.array(train_loss_lst))
