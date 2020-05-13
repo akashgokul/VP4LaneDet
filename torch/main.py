@@ -65,7 +65,7 @@ if __name__ == "__main__":
     parser.add_argument('--num_epochs_general', type=int, default=5,
                         help='number of epochs for entire model (after vp phase)')
 
-    parser.add_argument("--learning_rate", type=float, default = 1e-3, help='Learning Rate')
+    parser.add_argument("--learning_rate", type=float, default = 1e-4, help='Learning Rate')
 
 
     args = parser.parse_args()
