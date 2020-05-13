@@ -56,6 +56,16 @@ class LaneDetectionHelper:
         assert type(validation_dataloader) == DataLoader
         assert num_epochs > 0
 
+        #Training losses per batch
+        losses_lst = []
+        
+        #Lists updated per epoch
+        train_loss_lst = []
+        train_acc_lst = []
+        val_loss_lst = []
+        val_acc_lst = []
+
+
 
         self.model.train()
         for e in range(num_epochs):
@@ -79,12 +89,13 @@ class LaneDetectionHelper:
 
                 obj_mask_pred = self.model(rgb_img)
                 obj_mask_pred = obj_mask_pred.to(device=self.device)
+                print("PRETILE: ")
                 print(obj_mask_pred.shape)
 
-                # loss_weights = 9 * obj_mask + torch.ones(obj_mask.shape).to(device=self.device)
-                # loss_weights.to(device=self.device)
-                # loss_func = torch.nn.BCELoss(weight = loss_weights)
-                loss_func = torch.nn.MSELoss()
+                loss_weights = 75 * obj_mask + 1*torch.ones(obj_mask.shape).to(device=self.device)
+                loss_weights.to(device=self.device)
+                loss_func = torch.nn.BCELoss(weight = loss_weights)
+                # loss_func = torch.nn.BCEWithLogitsLoss()
                 loss = loss_func(obj_mask_pred, obj_mask)
                 print("------")
 
@@ -93,11 +104,12 @@ class LaneDetectionHelper:
                 self.optimizer.step()
 
                 #Updating training accuracy and training loss
-                train_loss += loss.item()
+                curr_loss = loss.item()
+                train_loss += curr_loss
+                losses_lst.append(curr_loss)
                 #Using PIXEL-Wise Accuracy!
                 round_obj_mask_pred = (obj_mask_pred > 0.5).float()
                 train_acc += ((round_obj_mask_pred == obj_mask).sum().item() )  / (obj_mask_pred.shape[0] * obj_mask_pred.shape[1] * obj_mask_pred.shape[2]* obj_mask_pred.shape[3])
-
 
                 self.optimizer.zero_grad()
 
@@ -105,12 +117,28 @@ class LaneDetectionHelper:
             train_loss = train_loss /  num_batches
             train_acc = 100 * train_acc / num_batches
 
+            train_loss_lst.append(train_loss)
+            train_acc_lst.append(train_acc)
+
             val_obj_mask_loss, val_obj_mask_acc = self.eval(validation_dataloader)
+
+            val_acc_lst.append(val_obj_mask_acc)
+            val_loss_lst.append(val_obj_mask_loss)
+            # val_obj_mask_loss, val_obj_mask_acc = 100000, 0
             elapsed = time.time() - start_time
             print(
                 "General Training: Epoch {:d} Train loss Obj: {:.2f}. Train Accuracy Obj: {:.2f}. Validation loss OBJ: {:.2f}. Validation Accuracy OBJ: {:.2f}. Elapsed time: {:.2f}ms. \n".format(
                 e + 1, train_loss, train_acc, val_obj_mask_loss, val_obj_mask_acc, elapsed)
                 )
+        
+        np.save('naive_losses_lst',np.array(losses_lst))
+        np.save('naive_train_losses_lst',np.array(train_loss_lst))
+        np.save('naive_val_losses_lst',np.array(val_loss_lst))
+        np.save('naive_train_acc_lst',np.array(train_acc_lst))
+        np.save('naive_val_acc_lst',np.array(val_acc_lst))
+
+        torch.save(self.model,'75weight_4ep_naive.pt')
+        torch.save(self.model.state_dict(), '75weight_4ep_naive_dict.pt')
 
         
     
@@ -145,15 +173,13 @@ class LaneDetectionHelper:
                 obj_mask_pred = self.model(rgb_img)
                 obj_mask_pred = obj_mask_pred.to(device=self.device)
 
-                # loss_weights = 9 * obj_mask + torch.ones(obj_mask.shape).to(device=self.device)
-                # loss_weights.to(device=self.device)
-                # loss_func = torch.nn.BCELoss(weight = loss_weights)
-                loss_func = torch.nn.MSELoss()
+                loss_weights = 75 * obj_mask + torch.ones(obj_mask.shape).to(device=self.device)
+                loss_weights.to(device=self.device)
+                loss_func = torch.nn.BCELoss(weight = loss_weights)
                 loss = loss_func(obj_mask_pred, obj_mask)
 
                 round_obj_mask_pred = (obj_mask_pred > 0.5).float()
                 obj_mask_acc += ((round_obj_mask_pred == obj_mask).sum().item() )  / (obj_mask_pred.shape[0] * obj_mask_pred.shape[1] * obj_mask_pred.shape[2]* obj_mask_pred.shape[3])
-
 
                 obj_mask_loss += loss.item()
 
@@ -177,19 +203,21 @@ class LaneDetectionHelper:
         self.model.eval()
         with torch.no_grad():
             num_batches = len(dataloader)
-            for batch_number, rgb_img in enumerate(dataloader):
-                print("Training Batch: " + str(batch_number) + " / " + str(num_batches))
+            for batch_number, (rgb_img, obj_mask, _) in enumerate(dataloader):
+                print("Testing Sample: " + str(batch_number) + " / " + str(num_batches))
                 rgb_img = rgb_img.type(torch.FloatTensor)
                 rgb_img = rgb_img.to(device=self.device)
 
                 obj_mask_pred = self.model(rgb_img)
+
                 obj_mask_pred = (obj_mask_pred > 0.5).float()
-                obj_mask_pred = obj_mask_pred.cpu().numpy()
+                obj_mask_pred = obj_mask_pred.cpu().detach().numpy()
 
                 rgb_img = rgb_img.cpu().numpy()
+                obj_mask = obj_mask.cpu().numpy()
 
-                temp_dict = {'img':rgb_img, 'obj_mask_pred': obj_mask_pred}
-                scipy.io.savemat('naive_test_pred2/' + str(batch_number) + "_pred.mat", temp_dict)
+                temp_dict = {'img':rgb_img, 'obj_mask':obj_mask,'obj_mask_pred': obj_mask_pred}
+                scipy.io.savemat('naive_test_official/' + str(batch_number) + "_pred.mat", temp_dict)
 
         print("Done Testing!")
         

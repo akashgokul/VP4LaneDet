@@ -221,8 +221,8 @@ class VPGData(Dataset):
         if(self.transform):
             rgb_img = self.transform(rgb_img)
 
-        if(self.split == 'test'):
-            return rgb_img
+        # if(self.split == 'test'):
+        #     return rgb_img
         
         tensor_transform = transforms.ToTensor()
         return rgb_img, tensor_transform(obj_mask), tensor_transform(vp)

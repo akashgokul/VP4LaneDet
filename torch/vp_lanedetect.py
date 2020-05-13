@@ -56,7 +56,15 @@ class VP4LaneDetection:
             Train_dataloader: Dataloader for training dataset
             Val_dataloader: Dataloader for validation dataset
             Num_epochs_vp: Number of epochs to train vpp branch (cross-entropy)
-            Num_epochs_general: Number of epochs to train entire model
+            Num_epochs_general: Number of epochs to train entire model (L1 obj_mask Loss)
+        """
+
+        """
+        Args:
+            Train_dataloader: Dataloader for training dataset
+            Val_dataloader: Dataloader for validation dataset
+            Num_epochs_vp: Number of epochs to train vpp branch (cross-entropy)
+            Num_epochs_general: Number of epochs to train entire model (L1 obj_mask Loss)
         """
 
         #Checking that args are valid
@@ -71,8 +79,7 @@ class VP4LaneDetection:
         vp_phase_val_acc = []
 
         self.model.train()
-        num_batches = len(train_dataloader)
-        for e in range(0*num_epochs_vp):
+        for e in range(num_epochs_vp):
             start_time = time.time()
             train_loss = 0.0
             train_vp_acc = 0.0
@@ -81,6 +88,8 @@ class VP4LaneDetection:
             print("-----"*10)
             print("VP Training Phase")
             print("-----"*10)
+            num_batches = len(train_dataloader)
+            print(num_batches)
             for batch_number, (rgb_img, obj_mask ,vp) in enumerate(train_dataloader):
                 print("Training Batch: " + str(batch_number) + " / " + str(num_batches))
                 rgb_img = rgb_img.type(torch.FloatTensor)
@@ -93,7 +102,6 @@ class VP4LaneDetection:
                 #Need for loss comp.
                 vp = vp.type(torch.FloatTensor)
                 vp = vp.to(device=self.device)
-
 
                 outputs = self.model(rgb_img)
 
@@ -112,8 +120,9 @@ class VP4LaneDetection:
 
                 #Updating training accuracy and training loss
                 train_loss += loss_vp.item()
-                round_pred_vp = (vp_pred > 0.5).float()
-                train_vp_acc += ((round_pred_vp == vp).sum().item() )  / (vp_pred.shape[0] * vp_pred.shape[1] * vp_pred.shape[2] * vp_pred.shape[3])
+                rounded_pred_vp = (vp_pred > 0.5).float()
+                train_vp_acc += ((rounded_pred_vp == vp).sum().item() )  / (vp_pred.shape[0] * vp_pred.shape[1] * vp_pred.shape[2] * vp_pred.shape[3])
+
                 self.optimizer.zero_grad()
 
             #Normalizing by number of batches
@@ -130,7 +139,7 @@ class VP4LaneDetection:
             
             elapsed = time.time() - start_time
             print(
-                "VP Training: Epoch {:d} Train loss VP: {:.2f}. Train Accuracy VP: {:.2f}. Validation loss OBJ: {:.2f}. Validation Accuracy OBJ: {:.2f}. Validation Loss VP: {:.2f}. Validation Accuracy VP: {:.2f}. Elapsed time: {:.2f}ms. \n".format(
+                "General Training: Epoch {:d} Train loss vp: {:.2f}. Train Accuracy VP: {:.2f}. Validation loss OBJ: {:.2f}. Validation Accuracy OBJ: {:.2f}. Validation Loss VP: {:.2f}. Validation Accuracy VP: {:.2f}. Elapsed time: {:.2f}ms. \n".format(
                 e + 1, train_loss, train_vp_acc, val_obj_mask_loss, val_obj_mask_acc, validation_loss_vp, validation_acc_vp, elapsed)
                 )
 
@@ -141,6 +150,7 @@ class VP4LaneDetection:
         phase2_mask_val_acc = []
 
         phase2_loss = []
+        torch.cuda.empty_cache()
         for e in range(num_epochs_general):
             start_time = time.time()
             train_loss = 0
@@ -175,9 +185,9 @@ class VP4LaneDetection:
 
                 loss_vp = self.loss_vp(vp_pred, vp)
                 loss_obj_mask = self.loss_obj_mask(obj_mask_pred,obj_mask)
-                # if(batch_number == 0):
-                #     w1 = 1 / loss_obj_mask
-                #     w4 = 1 / loss_vp
+                if(batch_number == 0):
+                    w1 = 1 / loss_obj_mask
+                    w4 = 1 / loss_vp
 
                 loss = w1*loss_obj_mask + w4*loss_vp
                 loss.backward(retain_graph = True)
@@ -187,7 +197,7 @@ class VP4LaneDetection:
                 round_pred_obj = (obj_mask_pred > 0.5).float()
                 round_pred_vp = (vp_pred > 0.5).float()
 
-                train_acc_vp_p2 += ((round_pred_vp == vp).sum().item() )  / (vp_pred.shape[0] * vp_pred.shape[1] * vp_pred.shape[2] * vp_pred.shape[3])
+                train_acc_vp_p2 += ((rounded_pred_vp == vp).sum().item() )  / (vp_pred.shape[0] * vp_pred.shape[1] * vp_pred.shape[2] * vp_pred.shape[3])
                 train_acc_obj += ((round_pred_obj == obj_mask).sum().item() )  / (obj_mask_pred.shape[0] * obj_mask_pred.shape[1] * obj_mask_pred.shape[2]*vp_pred.shape[3])
                 self.optimizer.zero_grad()
 
@@ -269,12 +279,9 @@ class VP4LaneDetection:
                 vp_loss += loss_vp.item()
                 obj_mask_loss += loss_obj_mask.item()
 
-
-                round_pred_obj = (obj_mask_pred > 0.5).float()
-                round_pred_vp = (vp_pred > 0.5).float()
-
-                vp_acc += ((round_pred_vp == vp).sum().item() )  / (vp_pred.shape[0] * vp_pred.shape[1] * vp_pred.shape[2] * vp_pred.shape[3])
-                obj_mask_acc += ((round_pred_obj == obj_mask).sum().item() )  / (obj_mask_pred.shape[0] * obj_mask_pred.shape[1] * obj_mask_pred.shape[2]*obj_mask_pred.shape[3])
+                
+                vp_acc += ((vp_pred == vp).sum().item() )  / (vp_pred.shape[0] * vp_pred.shape[1] * vp_pred.shape[2] * vp_pred.shape[3])
+                obj_mask_acc += ((obj_mask_pred == obj_mask).sum().item() )  / (obj_mask_pred.shape[0] * obj_mask_pred.shape[1] * obj_mask_pred.shape[2]*obj_mask_pred.shape[3])
 
                 obj_mask_loss += loss_obj_mask
                 vp_loss += loss_vp
@@ -302,19 +309,13 @@ class VP4LaneDetection:
         with torch.no_grad():
             for batch_number, rgb_img in enumerate(dataloader):
                 rgb_img = rgb_img.to(device = self.device)
-
                 obj_mask_pred, vp_pred = self.model(rgb_img)
-                obj_mask_pred = (obj_mask_pred > 0.5).float()
+                obj_mask_pred = (obj_mask_pred > 0.5)
                 obj_mask_pred = obj_mask_pred.cpu().numpy()
-
-                vp_pred = (vp_pred > 0.5).float()
+                vp_pred = (vp_pred > 0.5)
                 vp_pred = vp_pred.cpu().numpy()
-
                 rgb_img = rgb_img.cpu().numpy()
-                rgb_img = np.rollaxis(rgb_img, 0, 2)
-                obj_mask_pred = np.rollaxis(obj_mask_pred, 0, 2)
-                vp_pred = np.rollaxis(vp_pred,0,2)
-
+                rgb_img = np.rollaxis(rgb_img, 0, 2) 
                 temp_dict = {'img':rgb_img, 'obj_mask_pred': obj_mask_pred, 'vp_pred':vp_pred}
                 scipy.io.savemat('test_pred/' + str(batch_number) + "_pred.mat", temp_dict)
 

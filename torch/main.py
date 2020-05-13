@@ -13,10 +13,7 @@ from torchvision import transforms, utils
 
 def main(args):
 
-    transform = transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Normalize([72.61509, 73.82126, 71.80697], [66.72383, 67.54961, 69.95039])
-    ])
+    transform = transforms.Compose([transforms.ToTensor()])
     train_dataset = VPGData(args.root_dir, args.csv_path ,transform = transform, split = 'train')
     valid_dataset = VPGData(args.root_dir, args.csv_path, transform = transform, split = 'validation')
 
@@ -33,9 +30,9 @@ def main(args):
         helper = VP4LaneDetection(model = model, learning_rate = args.learning_rate)
         helper.train(train_dataloader, valid_dataloader, args.num_epochs_vp, args.num_epochs_general)
     
-    test_dataset = VPGData(args.root_dir, args.csv_path, transform = transform, split = 'test')
-    test_dataloader = DataLoader(test_dataset, batch_size = 1, shuffle = True, num_workers = 1)
-    helper.test(test_dataloader)
+    # test_dataset = VPGData(args.root_dir, args.csv_path, transform = transform, split = 'test')
+    # test_dataloader = DataLoader(test_dataset, batch_size = 1, shuffle = True, num_workers = 1)
+    helper.test(valid_dataloader)
     # test_loss, test_acc = helper.eval(test_dataloader)
     # print("Test Accuracy: " + str(test_acc))
 

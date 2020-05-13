@@ -26,8 +26,7 @@ class LaneDetect(nn.Module):
             nn.Conv2d(384, 384, kernel_size=3, stride=1, padding=1),
             nn.MaxPool2d(kernel_size=3, stride=2),
             #Conv6
-            nn.Conv2d(384, 4096, kernel_size=6, stride=1, padding=3),
-            nn.Dropout(),
+            nn.Conv2d(384, 4096, kernel_size=6, stride=1, padding=3)
         )
         # self.grid_box = Sequential(
         #     #Conv 7
@@ -40,12 +39,11 @@ class LaneDetect(nn.Module):
         # )
         self.obj_mask = nn.Sequential(
             #Conv 7
-            nn.Conv2d(4096, 4096, kernel_size=1, stride=1, padding=0), 
-            nn.Dropout(),
-            #Conv 8
-            nn.Conv2d(4096, 64, kernel_size=1, stride=1, padding=0), 
-            #Tiling
-            nn.ConvTranspose2d(64, 1, kernel_size = 8, stride=8)
+            nn.ConvTranspose2d(4096, 384, kernel_size=2, stride=2), 
+            nn.Conv2d(384, 384, kernel_size=3, stride=1, padding=1),
+            nn.ConvTranspose2d(384,256, kernel_size=2, stride=2), 
+            nn.Conv2d(256, 256, kernel_size=3, stride=1, padding=1),
+            nn.ConvTranspose2d(256,1 ,kernel_size=2, stride=2)
         )
         # self.vp = nn.Sequential(
         #     #Conv 7
@@ -65,14 +63,8 @@ class LaneDetect(nn.Module):
         x = self.shared(x)
 
         #Pass through the obj_mask branch 
-        obj_mask = self.obj_mask(x)
-        # #Reshape into (120,160,2)
-        obj_mask = obj_mask.view(-1,1,120,160)
+        obj_mask = torch.sigmoid(self.obj_mask(x))
 
-        #Pass through the vp branch 
-        # vp = torch.sigmoid(self.vp(x))
-        # #Reshape into (120,160,5)
-        # vp = vp.view(120,160,5)
 
-        return obj_mask      #, vp
-        
+
+        return obj_mask      
