@@ -58,6 +58,7 @@ class LaneDetectionHelper:
 
         #Training losses per batch
         losses_lst = []
+        accs_lst = []
         
         #Lists updated per epoch
         train_loss_lst = []
@@ -107,9 +108,12 @@ class LaneDetectionHelper:
                 curr_loss = loss.item()
                 train_loss += curr_loss
                 losses_lst.append(curr_loss)
+
                 #Using PIXEL-Wise Accuracy!
                 round_obj_mask_pred = (obj_mask_pred > 0.5).float()
-                train_acc += ((round_obj_mask_pred == obj_mask).sum().item() )  / (obj_mask_pred.shape[0] * obj_mask_pred.shape[1] * obj_mask_pred.shape[2]* obj_mask_pred.shape[3])
+                curr_acc = ((round_obj_mask_pred == obj_mask).sum().item() )  / (obj_mask_pred.shape[0] * obj_mask_pred.shape[1] * obj_mask_pred.shape[2]* obj_mask_pred.shape[3])
+                train_acc += curr_acc
+                accs_lst.append(curr_acc)
 
                 self.optimizer.zero_grad()
 
@@ -134,14 +138,15 @@ class LaneDetectionHelper:
             if(val_obj_mask_acc >= 90):
                 break
         
-        np.save('naive_losses_lst',np.array(losses_lst))
-        np.save('naive_train_losses_lst',np.array(train_loss_lst))
-        np.save('naive_val_losses_lst',np.array(val_loss_lst))
-        np.save('naive_train_acc_lst',np.array(train_acc_lst))
-        np.save('naive_val_acc_lst',np.array(val_acc_lst))
+        # np.save('naive_losses_lst',np.array(losses_lst))
+        # np.save('naive_train_losses_lst',np.array(train_loss_lst))
+        # np.save('naive_val_losses_lst',np.array(val_loss_lst))
+        # np.save('naive_train_acc_lst',np.array(train_acc_lst))
+        # np.save('naive_val_acc_lst',np.array(val_acc_lst))
+        np.save('train_batch_acc_lst', np.array(accs_lst))
 
-        torch.save(self.model,'75weight_4ep_naive.pt')
-        torch.save(self.model.state_dict(), '75weight_4ep_naive_dict.pt')
+        # torch.save(self.model,'75weight_4ep_naive.pt')
+        # torch.save(self.model.state_dict(), '75weight_4ep_naive_dict.pt')
 
         
     
