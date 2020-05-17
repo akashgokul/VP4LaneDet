@@ -4,7 +4,6 @@ from torch.utils.data import DataLoader
 import os
 import numpy as np
 import scipy.io
-import tqdm
 import time
 from vpgnet_torch import VPGNet
 
