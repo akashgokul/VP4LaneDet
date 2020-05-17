@@ -174,27 +174,24 @@ class LaneDetectionHelper:
 
 
         self.model.eval()
+        num_batches = len(dataloader)
         with torch.no_grad():
-            num_batches = len(dataloader)
-            for batch_number, rgb_img in enumerate(dataloader):
-                if(batch_number == 3):
-                    break
-                print("Training Batch: " + str(batch_number) + " / " + str(num_batches))
-                rgb_img = rgb_img.type(torch.FloatTensor)
-                rgb_img = rgb_img.to(device=self.device)
+            for batch_number, (rgb_img, obj_mask, _) in enumerate(dataloader):
+                    print("Testing Batch: " + str(batch_number) + " / " + str(num_batches))
+                    rgb_img = rgb_img.type(torch.FloatTensor)
+                    rgb_img = rgb_img.to(device=self.device)
 
-                obj_mask_pred = self.model(rgb_img)
-                obj_mask_pred = (obj_mask_pred > 0.5).float()
-                obj_mask_pred = obj_mask_pred.cpu().numpy()
-                print(obj_mask_pred.shape)
+                    obj_mask_pred = self.model(rgb_img)
 
-                rgb_img = rgb_img.cpu().numpy()
 
-                temp_dict = {'img':rgb_img, 'obj_mask_pred': obj_mask_pred}
-                #scipy.io.savemat('/content/gdrive/My Drive/VPGNet/naive_test/' + str(batch_number) + "_pred.mat", temp_dict)
+                    obj_mask_pred = (obj_mask_pred > 0.5).float()
+                    obj_mask_pred = obj_mask_pred.cpu().detach().numpy()
 
-        print("Done Testing!")
-        
-        return
+                    rgb_img = rgb_img.cpu().numpy()
+                    obj_mask = obj_mask.cpu().numpy()
+
+                    temp_dict = {'img':rgb_img, 'obj_mask':obj_mask,'obj_mask_pred': obj_mask_pred}
+                    #scipy.io.savemat('/content/gdrive/My Drive/VPGNet/naive_test_bad/' + str(batch_number) + "_pred.mat", temp_dict)
+
 
 
