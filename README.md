@@ -1,7 +1,23 @@
-# Lane Detection using Vanishing Points
+# Lane Detection Using Vanishing Points
 
-This repository provides the code for our CS294-167 final project: Lane Detection using Vanishing Points. Through the course of this experiment, we primarily used Google Colab. The Colab links for our naive one-task network can be found: https://colab.research.google.com/drive/1g2PUqlCkE_qzPQWWJgNnLV2bGf2KLAu_?usp=sharing. 
 
-Additionally, the naive one-task network code on this file can be run by executing the torch/main.py file. Note, running this github codebase requires: PyTorch, OpenCV2, Numpy, SciPy, and Pandas.
+## Overview
 
-Furthermore, our vanishing point based lane detection model can be found at: https://colab.research.google.com/drive/1W4dX96ZmzpDaOq_KsI_l5TSfvjtIG0Fd?usp=sharing. 
+***
+
+This repository provides the code for our CS294-167 final project: Lane Detection using Vanishing Points. Through the course of this experiment, we primarily used Google Colab. Files for our code is also available on this repository.
+
+Our multi-task CNN which also predicts the scene's vanishing point can be found [here](https://colab.research.google.com/drive/1W4dX96ZmzpDaOq_KsI_l5TSfvjtIG0Fd?usp=sharing).
+
+For reference we have also implemented a naive one-task network which directly outputs semantic segmentation masks of the lane marking (without explicitly finding the vanishing point), code for that network is available [here](https://colab.research.google.com/drive/1g2PUqlCkE_qzPQWWJgNnLV2bGf2KLAu_?usp=sharing).
+
+## Dependencies
+
+***
+
+This codebase requires the following packages:
+-PyTorch
+-Numpy
+-OpenCV2
+-SciPy
+-Pandas
