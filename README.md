@@ -13,8 +13,8 @@ For reference we have also implemented a naive one-task network which directly o
 
 This codebase requires the following packages:
 
--PyTorch
--Numpy
--OpenCV2
--SciPy
--Pandas
+- PyTorch
+- Numpy
+- OpenCV2
+- SciPy
+- Pandas
