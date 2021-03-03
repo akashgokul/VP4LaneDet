@@ -12,6 +12,7 @@ For reference we have also implemented a naive one-task network which directly o
 ## Dependencies
 
 This codebase requires the following packages:
+
 -PyTorch
 -Numpy
 -OpenCV2
