@@ -3,7 +3,7 @@
 
 ## Overview
 
-This repository provides the code for our CS294-167 final project: Lane Detection using Vanishing Points. Through the course of this experiment, we primarily used Google Colab. Files for our code is also available on this repository.
+This repository provides the code for our CS294-167 final project: Lane Detection using Vanishing Points. Through the course of this experiment, we primarily used Google Colab. Files for our code are also available on this repository.
 
 Our multi-task CNN which also predicts the scene's vanishing point can be found [here](https://colab.research.google.com/drive/1W4dX96ZmzpDaOq_KsI_l5TSfvjtIG0Fd?usp=sharing).
 
